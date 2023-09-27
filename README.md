@@ -60,7 +60,7 @@ bucket_definitions:
 Copy the `AppConfig.template.ts` to a usable file
 
 ```bash
-cp library/AppConfig.template.ts library/AppConfig.ts
+cp library/supabase/AppConfig.template.ts library/supabase/AppConfig.ts
 ```
 
 Insert the necessary credentials.
