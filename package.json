@@ -10,9 +10,9 @@
   "dependencies": {
     "@azure/core-asynciterator-polyfill": "^1.0.2",
     "@expo/vector-icons": "^13.0.0",
-    "@journeyapps/powersync-react-native-quick-sqlite-adapter": "0.0.0-dev.ca520aa2",
-    "@journeyapps/powersync-sdk-react-native": "0.0.0-dev.ca520aa2",
-    "@journeyapps/react-native-quick-sqlite": "0.0.0-dev.ca520aa2",
+    "@journeyapps/powersync-react-native-quick-sqlite-adapter": "0.0.0-dev.9533c2c7",
+    "@journeyapps/powersync-sdk-react-native": "0.0.0-dev.9533c2c7",
+    "@journeyapps/react-native-quick-sqlite": "0.0.0-dev.9533c2c7",
     "@react-native-community/masked-view": "^0.1.11",
     "@react-navigation/drawer": "^6.6.3",
     "@react-navigation/native": "^6.0.0",
