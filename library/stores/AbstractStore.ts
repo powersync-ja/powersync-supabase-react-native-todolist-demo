@@ -16,11 +16,14 @@ export abstract class AbstractStore<Model extends AbstractModel> {
       createModel: action,
       removeModel: action
     });
-    this.watchItems();
   }
 
   getById(id: string): Model | undefined {
     return this.collection.find((i) => i.id == id);
+  }
+
+  init() {
+    this.watchItems();
   }
 
   /**

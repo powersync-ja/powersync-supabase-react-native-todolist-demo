@@ -73,7 +73,6 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
     }
 
     let lastOp: CrudEntry | null = null;
-
     try {
       // Note: If transactional consistency is important, use database functions
       // or edge functions to process the entire transaction in a single call.

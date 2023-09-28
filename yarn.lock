@@ -1671,18 +1671,18 @@
     "@journeyapps/evaluator" "6.2.4"
     "@journeyapps/parser-common" "8.0.1"
 
-"@journeyapps/powersync-react-native-quick-sqlite-adapter@0.0.0-dev.9533c2c7":
-  version "0.0.0-dev.9533c2c7"
-  resolved "https://registry.npmjs.org/@journeyapps/powersync-react-native-quick-sqlite-adapter/-/powersync-react-native-quick-sqlite-adapter-0.0.0-dev.9533c2c7.tgz#326d9dccc82df5e1be2ca3dec25375b84f012a91"
-  integrity sha512-XMkNEBJ8C66Q/85Wllm5r1D+7jzvImo44bRFu0qriE8QlpnFhDafsyI5cdTGdpxQnFMeIC4QVVlYk+cdSVnwmA==
+"@journeyapps/powersync-react-native-quick-sqlite-adapter@0.0.0-dev.23ba6b77":
+  version "0.0.0-dev.23ba6b77"
+  resolved "https://registry.npmjs.org/@journeyapps/powersync-react-native-quick-sqlite-adapter/-/powersync-react-native-quick-sqlite-adapter-0.0.0-dev.23ba6b77.tgz#93dc8748d064e37b22926f57fd4ebad10206b976"
+  integrity sha512-4gWV8eXJ8tgifZs/dSMAPahJT6xpDd7sk9ZBEgoeEXfVVWRebHLlRILxjfIRTfD2DV4UCD1mjzu9sRV9UDV4SQ==
   dependencies:
     "@journeyapps/core" "^10.0.0"
-    "@journeyapps/powersync-sdk-react-native" "0.0.0-dev.9533c2c7"
+    "@journeyapps/powersync-sdk-react-native" "0.0.0-dev.23ba6b77"
 
-"@journeyapps/powersync-sdk-common@0.0.0-dev.9533c2c7":
-  version "0.0.0-dev.9533c2c7"
-  resolved "https://registry.npmjs.org/@journeyapps/powersync-sdk-common/-/powersync-sdk-common-0.0.0-dev.9533c2c7.tgz#2a2a0684c0a890a31658fbb2c01397322245f94c"
-  integrity sha512-tpxly1qhoQr5aEAjeSNEucD4WbfsKBZFFjMo+Ek17zGpsLuWLX1yt1VW27LAsT43EIJOgxCBSwZoruw8C1pPHw==
+"@journeyapps/powersync-sdk-common@0.0.0-dev.23ba6b77":
+  version "0.0.0-dev.23ba6b77"
+  resolved "https://registry.npmjs.org/@journeyapps/powersync-sdk-common/-/powersync-sdk-common-0.0.0-dev.23ba6b77.tgz#464d0f41cce191d637311ccdc258ebeb0f988f50"
+  integrity sha512-Bf2qcVWOiuET3zWSDcdzoTw2rf67z4oRyS7EsGvddfdELB/sAhE3WECgCTQcbL5RNdnYRjoR8jB7lRmgA45mrA==
   dependencies:
     "@journeyapps/core" "^10.0.0"
     async-mutex "^0.4.0"
@@ -1692,18 +1692,18 @@
     lodash "^4.17.21"
     object-hash "^3.0.0"
 
-"@journeyapps/powersync-sdk-react-native@0.0.0-dev.9533c2c7":
-  version "0.0.0-dev.9533c2c7"
-  resolved "https://registry.npmjs.org/@journeyapps/powersync-sdk-react-native/-/powersync-sdk-react-native-0.0.0-dev.9533c2c7.tgz#c1291985159c8b2c52304d0b54bfa3dfa3d7ae8f"
-  integrity sha512-6K1clv0lLyZ1M0ybuSE7Rl7Eraj6J8Ep5r78ZhwVudLKfd7V/tCMF/NQAmgjQQR2KDhhNRld0h0Gx9JEj9bkxA==
+"@journeyapps/powersync-sdk-react-native@0.0.0-dev.23ba6b77":
+  version "0.0.0-dev.23ba6b77"
+  resolved "https://registry.npmjs.org/@journeyapps/powersync-sdk-react-native/-/powersync-sdk-react-native-0.0.0-dev.23ba6b77.tgz#94f1b041576151651c3eddd365c75ccb7816a039"
+  integrity sha512-2KI/dV3WjuCtzi38QPkjEYriJZxVbPne0atXQpbZXivpA+VFoJYRq3b71LLndHzmH30nzmjidXOuvFgP7ykDhQ==
   dependencies:
-    "@journeyapps/powersync-sdk-common" "0.0.0-dev.9533c2c7"
+    "@journeyapps/powersync-sdk-common" "0.0.0-dev.23ba6b77"
     async-lock "^1.4.0"
 
-"@journeyapps/react-native-quick-sqlite@0.0.0-dev.9533c2c7":
-  version "0.0.0-dev.9533c2c7"
-  resolved "https://registry.npmjs.org/@journeyapps/react-native-quick-sqlite/-/react-native-quick-sqlite-0.0.0-dev.9533c2c7.tgz#71fbc26ea0c2b5b6e9078f27884d2adf97f92922"
-  integrity sha512-L0edQjabxghwGcZH5gw9Pf7SO7avK5/NUzpcCewO/rSZstxPA1/444nYtxdgz1Jz7BXsdJt5TyMIRpmrolRzSA==
+"@journeyapps/react-native-quick-sqlite@0.0.0-dev.23ba6b77":
+  version "0.0.0-dev.23ba6b77"
+  resolved "https://registry.npmjs.org/@journeyapps/react-native-quick-sqlite/-/react-native-quick-sqlite-0.0.0-dev.23ba6b77.tgz#fd93b2bbcad9d836ad365ab59803ab09119a3b7e"
+  integrity sha512-INd+L1JndNZeNENsoD+5eGVJa9PKrF9LIUVNZEms7gQ7SUwo61MhWm28w6BGntc3TJBc0gcmwsBgpBGO11PRuA==
 
 "@jridgewell/gen-mapping@^0.3.0", "@jridgewell/gen-mapping@^0.3.2":
   version "0.3.3"
@@ -2202,6 +2202,11 @@
   version "7.0.13"
   resolved "https://registry.npmjs.org/@types/json-schema/-/json-schema-7.0.13.tgz#02c24f4363176d2d18fc8b70b9f3c54aba178a85"
   integrity sha512-RbSSoHliUbnXj3ny0CNFOoxrIDV6SUGyStHsvDqosw6CkdPV8TtWGlfecuK4ToyMEAql6pzNxgCFKanovUzlgQ==
+
+"@types/lodash@^4.14.199":
+  version "4.14.199"
+  resolved "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.199.tgz#c3edb5650149d847a277a8961a7ad360c474e9bf"
+  integrity sha512-Vrjz5N5Ia4SEzWWgIVwnHNEnb1UE1XMkvY5DGXrAeOGE9imk0hgTHh5GyDjLDJi9OTCn9oo9dXH1uToK1VRfrg==
 
 "@types/node@*":
   version "20.7.0"
