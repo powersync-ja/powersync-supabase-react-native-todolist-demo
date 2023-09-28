@@ -4,7 +4,7 @@ This package is currently in an alpha release. Functionality could change dramat
 
 # PowerSync + Supabase React Native Demo: Todo List App
 
-![docs-supabase-integration](assets/powersync_supabase_react_native.png)
+![powersync_supabase_react_native](https://github.com/de1mat/powersync-supabase-react-native-todolist-demo/assets/901045/02517426-85d2-4ac8-8ea5-f8e21f14e553)
 
 Demo app demonstrating use of the PowerSync SDK for React Native together with Supabase. For a step-by-step guide, see [here](https://docs.powersync.co/integration-guides/supabase).
 
