@@ -1,8 +1,10 @@
 # Alpha
+
 This package is currently in an alpha release. Functionality could change dramatically in future releases. Certain functions may be partially implemented or buggy.
 
 # PowerSync + Supabase React Native Demo: Todo List App
-![docs-supabase-integration](https://github.com/journeyapps/powersync-supabase-flutter-demo/assets/277659/291fa2eb-abe6-4567-8d4b-c88e0ee850cf)
+
+![powersync_supabase_react_native](https://github.com/de1mat/powersync-supabase-react-native-todolist-demo/assets/901045/02517426-85d2-4ac8-8ea5-f8e21f14e553)
 
 Demo app demonstrating use of the PowerSync SDK for React Native together with Supabase. For a step-by-step guide, see [here](https://docs.powersync.co/integration-guides/supabase).
 
@@ -15,15 +17,16 @@ yarn install
 ```
 
 Run on iOS
+
 ```sh
 yarn ios
 ```
 
 Run on Android
+
 ```sh
 yarn android
 ```
-
 
 # Setup Supabase Project
 
@@ -35,7 +38,6 @@ It does the following:
 2. Create a publication called `powersync` for `lists` and `todos`.
 3. Enable row level security, allowing users to only view and edit their own data.
 4. Create a trigger to populate some sample data when an user registers.
-
 
 # Setup PowerSync Instance
 
@@ -58,8 +60,7 @@ bucket_definitions:
 Copy the `AppConfig.template.ts` to a usable file
 
 ```bash
-cp library/AppConfig.template.ts library/AppConfig.ts
+cp library/supabase/AppConfig.template.ts library/supabase/AppConfig.ts
 ```
 
 Insert the necessary credentials.
-
