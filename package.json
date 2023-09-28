@@ -10,9 +10,9 @@
   "dependencies": {
     "@azure/core-asynciterator-polyfill": "^1.0.2",
     "@expo/vector-icons": "^13.0.0",
-    "@journeyapps/powersync-react-native-quick-sqlite-adapter": "0.0.0-dev.9533c2c7",
-    "@journeyapps/powersync-sdk-react-native": "0.0.0-dev.9533c2c7",
-    "@journeyapps/react-native-quick-sqlite": "0.0.0-dev.9533c2c7",
+    "@journeyapps/powersync-react-native-quick-sqlite-adapter": "0.0.0-dev.23ba6b77",
+    "@journeyapps/powersync-sdk-react-native": "0.0.0-dev.23ba6b77",
+    "@journeyapps/react-native-quick-sqlite": "0.0.0-dev.23ba6b77",
     "@react-native-community/masked-view": "^0.1.11",
     "@react-navigation/drawer": "^6.6.3",
     "@react-navigation/native": "^6.0.0",
@@ -25,6 +25,7 @@
     "expo-router": "2.0.0",
     "expo-splash-screen": "~0.20.5",
     "expo-status-bar": "~1.6.0",
+    "js-logger": "^1.6.1",
     "lodash": "^4.17.21",
     "metro": "~0.76.7",
     "mobx": "^6.10.2",
@@ -53,6 +54,7 @@
   "devDependencies": {
     "@babel/plugin-transform-async-generator-functions": "^7.22.15",
     "@babel/preset-env": "^7.1.6",
+    "@types/lodash": "^4.14.199",
     "@types/react": "~18.0.14",
     "@types/react-native-table-component": "^1.2.4",
     "find-yarn-workspace-root": "^2.0.0",

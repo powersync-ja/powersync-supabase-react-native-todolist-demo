@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite';
 
 import { useSystem } from '../library/stores/system';
 import { router } from 'expo-router';
-
+import Logger from 'js-logger';
 /**
  * This is the entry point when the app loads.
  * Checks for a Supabase session.
@@ -15,6 +15,8 @@ const App = observer(() => {
   const { supabaseConnector } = useSystem();
 
   React.useEffect(() => {
+    Logger.useDefaults();
+    Logger.setLevel(Logger.DEBUG);
     supabaseConnector.supabaseClient.auth
       .getSession()
       .then(({ data, error }) => {

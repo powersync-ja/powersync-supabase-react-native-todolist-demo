@@ -45,6 +45,11 @@ export class System {
   async init() {
     await this.powersync.init();
     await this.powersync.connect(this.supabaseConnector);
+
+    // Make sure to only watch queries after PowerSync has been initialized as those tables
+    // might not exist yet.
+    this.listStore.init();
+    this.todoStore.init();
   }
 }
 

@@ -1,8 +1,6 @@
 import _ from 'lodash';
-import { QueryResult } from '@journeyapps/powersync-sdk-react-native';
 import { LIST_TABLE, ListModel, ListRecord } from '../models/ListModel';
 import { AbstractStore } from './AbstractStore';
-import { System } from './system';
 
 export class ListStore extends AbstractStore<ListModel> {
   async *_watchItems(): AsyncIterable<ListModel[]> {
