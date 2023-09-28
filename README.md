@@ -6,7 +6,7 @@ This package is currently in an alpha release. Functionality could change dramat
 
 ## Overview
 
-Demo app demonstrating use of the PowerSync SDK for React Native together with Supabase.
+Demo app demonstrating use of the [PowerSync SDK for React Native](https://www.npmjs.com/package/@journeyapps/powersync-sdk-react-native) together with Supabase.
 
 A step-by-step guide on Supabase<>PowerSync integration is available [here](https://docs.powersync.co/integration-guides/supabase). (Note: This guide is currently written for Flutter apps; it will be updated for React Native soon)
 
