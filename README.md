@@ -32,7 +32,7 @@ Run on Android
 yarn android
 ```
 
-## Setup Supabase Project
+## Set up Supabase Project
 
 Create a new Supabase project, and paste and run the contents of [database.sql](./database.sql) in the Supabase SQL editor.
 
@@ -43,7 +43,7 @@ It does the following:
 3. Enable row level security, allowing users to only view and edit their own data.
 4. Create a trigger to populate some sample data when an user registers.
 
-## Setup PowerSync Instance
+## Set up PowerSync Instance
 
 Create a new PowerSync instance, connecting to the database of the Supabase project.
 
