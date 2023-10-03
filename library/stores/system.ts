@@ -3,8 +3,7 @@ import 'react-native-polyfill-globals/auto';
 import React from 'react';
 import { configure, makeAutoObservable, makeObservable, observable } from 'mobx';
 
-import { AbstractPowerSyncDatabase } from '@journeyapps/powersync-sdk-react-native';
-import { RNQSPowerSyncDatabaseOpenFactory } from '@journeyapps/powersync-react-native-quick-sqlite-adapter';
+import { AbstractPowerSyncDatabase, RNQSPowerSyncDatabaseOpenFactory } from '@journeyapps/powersync-sdk-react-native';
 
 import { AppSchema } from '../powersync/AppSchema';
 import { SupabaseConnector } from '../supabase/SupabaseConnector';
@@ -25,8 +24,7 @@ export class System {
   constructor() {
     const factory = new RNQSPowerSyncDatabaseOpenFactory({
       schema: AppSchema,
-      dbName: 'sqliteDB',
-      dbPath: 'sqliteDB.db'
+      dbFilename: 'sqlite.db'
     });
 
     this.supabaseConnector = new SupabaseConnector();
