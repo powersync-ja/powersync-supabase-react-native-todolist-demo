@@ -1,4 +1,4 @@
-package com.powersyncexample;
+package com.anonymous.powersyncexample;
 
 import android.app.Application;
 import android.content.res.Configuration;

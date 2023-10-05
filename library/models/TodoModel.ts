@@ -1,30 +1,31 @@
 import _ from "lodash";
-import { AbstractModel, ModelRecord } from "./AbstractModel";
-import { Transaction } from "@journeyapps/powersync-sdk-react-native";
+import {AbstractModel, ModelRecord} from "./AbstractModel";
+import {Transaction} from "@journeyapps/powersync-sdk-react-native";
+import {CameraCapturedPicture} from 'expo-camera';
 
 export interface TodoRecord extends ModelRecord {
-  created_at: string;
-  completed: boolean;
-  description: string;
-  completed_at?: string;
+    created_at: string;
+    completed: boolean;
+    description: string;
+    completed_at?: string;
 
-  created_by: string;
-  completed_by?: string;
-  list_id: string;
+    created_by: string;
+    completed_by?: string;
+    list_id: string;
 
-  photo_id?: string;
+    photo_id?: string;
 }
 
 export const TODO_TABLE = "todos";
 
 export class TodoModel extends AbstractModel<TodoRecord> {
-  get table() {
-    return TODO_TABLE;
-  }
+    get table() {
+        return TODO_TABLE;
+    }
 
-  async update(record: TodoRecord): Promise<void> {
-    await this.system.powersync.execute(
-      `UPDATE ${this.table}
+    async update(record: TodoRecord): Promise<void> {
+        await this.system.powersync.execute(
+            `UPDATE ${this.table}
              SET created_at = ?,
                  completed = ?,
                  completed_at = ?,
@@ -34,39 +35,43 @@ export class TodoModel extends AbstractModel<TodoRecord> {
                  list_id = ?,
                  photo_id = ?
              WHERE id = ?`,
-      [
-        record.created_at,
-        record.completed,
-        record.completed_at,
-        record.description,
-        record.created_by,
-        record.completed_by,
-        record.list_id,
-        record.photo_id,
-        record.id,
-      ]
-    );
-    _.merge(this.record, record);
-  }
+            [
+                record.created_at,
+                record.completed,
+                record.completed_at,
+                record.description,
+                record.created_by,
+                record.completed_by,
+                record.list_id,
+                record.photo_id,
+                record.id,
+            ]
+        );
+        _.merge(this.record, record);
+    }
 
-  async toggleCompletion(completed: boolean) {
-    const { userID } = await this.system.supabaseConnector.fetchCredentials();
+    async toggleCompletion(completed: boolean) {
+        const {userID} = await this.system.supabaseConnector.fetchCredentials();
 
-    return this.update({
-      ...this.record,
-      completed_at: completed ? new Date().toISOString() : undefined,
-      completed,
-      completed_by: completed ? userID : undefined,
-    });
-  }
+        return this.update({
+            ...this.record,
+            completed_at: completed ? new Date().toISOString() : undefined,
+            completed,
+            completed_by: completed ? userID : undefined,
+        });
+    }
 
-  async _delete(tx: Transaction): Promise<void> {
-    await tx.executeAsync(
-      `DELETE
+    async _delete(tx: Transaction): Promise<void> {
+        await tx.executeAsync(
+            `DELETE
                                FROM ${this.table}
                                WHERE id = ?`,
-      [this.id]
-    );
-    this.system.todoStore.removeModel(this);
-  }
+            [this.id]
+        );
+        this.system.todoStore.removeModel(this);
+    }
+
+    setPhoto(data: CameraCapturedPicture) {
+        console.log(JSON.stringify(data, null, 2));
+    }
 }
