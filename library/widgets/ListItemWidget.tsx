@@ -3,15 +3,16 @@ import { ListModel } from "../models/ListModel";
 import { Alert, View } from "react-native";
 import { ListItem, Icon, Button } from "react-native-elements";
 import { router } from "expo-router";
+import { observer } from 'mobx-react-lite';
+
 
 export const ListItemWidget: React.FC<{
   model: ListModel;
-}> = (props) => {
+}> = observer( (props) => {
   const { model } = props;
   return (
-    <View style={{ padding: 10 }}>
+    <View key={`list-${model.id}`} style={{ padding: 10 }}>
       <ListItem.Swipeable
-        key={`list-${model.id}`}
         bottomDivider
         onPress={() => {
           router.push({
@@ -58,4 +59,4 @@ export const ListItemWidget: React.FC<{
       </ListItem.Swipeable>
     </View>
   );
-};
+});

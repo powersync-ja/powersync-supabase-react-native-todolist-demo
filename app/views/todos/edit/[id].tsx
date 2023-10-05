@@ -62,7 +62,7 @@ const TodoView = observer(() => {
           );
         }}
       />
-      <ScrollView style={{ maxHeight: '90%' }}>
+      <ScrollView key={`edit-view`} style={{ maxHeight: '90%' }}>
         {listModel.todos.map((t) => {
           return <TodoItemWidget key={t.id} model={t} />;
         })}

@@ -1,6 +1,6 @@
-import _ from 'lodash';
 import { Transaction } from '@journeyapps/powersync-sdk-react-native';
 import { System } from '../stores/system';
+
 export interface ModelRecord {
   id: string;
 }

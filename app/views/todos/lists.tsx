@@ -40,7 +40,7 @@ const App = observer(() => {
           );
         }}
       />
-      <ScrollView style={{ maxHeight: '90%' }}>
+      <ScrollView key={'lists'} style={{ maxHeight: '90%' }}>
         {listStore.collection.map((t) => (
           <ListItemWidget key={t.id} model={t} />
         ))}

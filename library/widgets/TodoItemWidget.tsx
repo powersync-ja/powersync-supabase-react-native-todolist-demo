@@ -8,10 +8,9 @@ export const TodoItemWidget: React.FC<{ model: TodoModel }> = (props) => {
   const [loading, setLoading] = React.useState(false);
 
   return (
-    <View style={{ padding: 10 }}>
+    <View key={`todo-item-${model.id}`} style={{ padding: 10 }}>
       <ListItem.Swipeable
         bottomDivider
-        key={`todo-item-${model.id}`}
         rightContent={
           <Button
             containerStyle={{
