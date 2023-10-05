@@ -1,9 +1,9 @@
 // Needed to import early for uuids
-import 'react-native-get-random-values';
-import _ from 'lodash';
-import { action, makeObservable, observable, runInAction } from 'mobx';
-import { AbstractModel } from '../models/AbstractModel';
-import { System } from './system';
+import "react-native-get-random-values";
+import _ from "lodash";
+import { action, makeObservable, observable } from "mobx";
+import { AbstractModel } from "../models/AbstractModel";
+import { System } from "./system";
 
 export abstract class AbstractStore<Model extends AbstractModel> {
   collection: Model[];
@@ -14,7 +14,7 @@ export abstract class AbstractStore<Model extends AbstractModel> {
     makeObservable(this, {
       collection: observable,
       createModel: action,
-      removeModel: action
+      removeModel: action,
     });
   }
 
@@ -29,12 +29,14 @@ export abstract class AbstractStore<Model extends AbstractModel> {
   /**
    * Create the model and persist in DB
    */
-  protected abstract _createModel(record: Partial<Model['record']>): Promise<Model>;
+  protected abstract _createModel(
+    record: Partial<Model["record"]>
+  ): Promise<Model>;
 
   /**
    * Creates a model and updates stored collection
    */
-  async createModel(record: Partial<Model['record']>) {
+  async createModel(record: Partial<Model["record"]>) {
     const model = await this._createModel(record);
     this.collection.push(model);
     return model;
@@ -48,6 +50,7 @@ export abstract class AbstractStore<Model extends AbstractModel> {
   }
 
   protected abstract _watchItems(): AsyncIterable<Model[]>;
+
   /**
    * Watches the collection and updates the store
    */

@@ -1,17 +1,40 @@
-import React from 'react';
-import { ActivityIndicator, Alert, View } from 'react-native';
-import { ListItem, Icon } from 'react-native-elements';
-import { TodoModel } from '../models/TodoModel';
+import React from "react";
+import { ActivityIndicator, Alert, View } from "react-native";
+import { ListItem, Button } from "react-native-elements";
+import { TodoModel } from "../models/TodoModel";
 
-export const TodoItemWidget: React.FC<{
-  model: TodoModel;
-}> = (props) => {
+export const TodoItemWidget: React.FC<{ model: TodoModel }> = (props) => {
   const { model } = props;
   const [loading, setLoading] = React.useState(false);
 
   return (
     <View style={{ padding: 10 }}>
-      <ListItem bottomDivider>
+      <ListItem.Swipeable
+        bottomDivider
+        key={`todo-item-${model.id}`}
+        rightContent={
+          <Button
+            containerStyle={{
+              flex: 1,
+              justifyContent: "center",
+              backgroundColor: "#d3d3d3",
+            }}
+            type="clear"
+            icon={{ name: "delete", color: "red" }}
+            onPress={() => {
+              Alert.alert(
+                "Confirm",
+                "This item will be permanently deleted",
+                [
+                  { text: "Cancel" },
+                  { text: "Delete", onPress: () => model.delete() },
+                ],
+                { cancelable: true }
+              );
+            }}
+          />
+        }
+      >
         {loading ? (
           <ActivityIndicator />
         ) : (
@@ -19,7 +42,7 @@ export const TodoItemWidget: React.FC<{
             iconType="material-community"
             checkedIcon="checkbox-marked"
             uncheckedIcon="checkbox-blank-outline"
-            checked={!!model.record.completed}
+            checked={model.record.completed}
             onPress={async () => {
               setLoading(true);
               try {
@@ -35,20 +58,7 @@ export const TodoItemWidget: React.FC<{
         <ListItem.Content style={{ minHeight: 80 }}>
           <ListItem.Title>{model.record.description}</ListItem.Title>
         </ListItem.Content>
-        <Icon
-          name="delete"
-          onPress={() => {
-            Alert.alert(
-              'Confirm',
-              'This item will be permanently deleted',
-              [{ text: 'Cancel' }, { text: 'Delete', onPress: () => model.delete() }],
-              { cancelable: true }
-            );
-          }}
-          type="material-community"
-          color="red"
-        />
-      </ListItem>
+      </ListItem.Swipeable>
     </View>
   );
 };

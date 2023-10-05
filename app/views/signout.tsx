@@ -1,8 +1,8 @@
-import * as React from 'react';
-import { View, ActivityIndicator } from 'react-native';
-import { router } from 'expo-router';
+import * as React from "react";
+import { View, ActivityIndicator } from "react-native";
+import { router } from "expo-router";
 
-import { useSystem } from '../../library/stores/system';
+import { useSystem } from "../../library/stores/system";
 
 export default function Signout() {
   const { powersync, supabaseConnector } = useSystem();
@@ -11,12 +11,14 @@ export default function Signout() {
     (async () => {
       await powersync.disconnectAndClear();
       await supabaseConnector.supabaseClient.auth.signOut();
-      router.replace('signin');
+      router.replace("signin");
     })();
   }, []);
 
   return (
-    <View style={{ flexGrow: 1, alignContent: 'center', justifyContent: 'center' }}>
+    <View
+      style={{ flexGrow: 1, alignContent: "center", justifyContent: "center" }}
+    >
       <ActivityIndicator />
     </View>
   );
