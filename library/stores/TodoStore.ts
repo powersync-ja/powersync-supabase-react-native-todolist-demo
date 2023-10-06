@@ -14,7 +14,11 @@ export class TodoStore extends AbstractStore<TodoModel> {
         const {userID} = await this.system.supabaseConnector.fetchCredentials();
 
         await this.system.powersync.execute(
-            `INSERT INTO ${TODO_TABLE} (id, created_at, completed, completed_at, description, created_by, completed_by, photo_id, list_id) VALUES (uuid(), datetime(), ?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO
+                    ${TODO_TABLE} 
+                        (id, created_at, completed, completed_at, description, created_by, completed_by, photo_id, list_id) 
+                    VALUES 
+                        (uuid(), datetime(), ?, ?, ?, ?, ?, ?, ?)`,
             [
                 record.completed,
                 record.completed_at,

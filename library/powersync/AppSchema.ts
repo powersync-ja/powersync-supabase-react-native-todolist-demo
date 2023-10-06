@@ -46,7 +46,7 @@ export const AppSchema = new Schema([
     Table.createLocalOnly({
         name: "upload_queue",
         columns: [
-            new Column({name: "photo_id", type: ColumnType.TEXT}),
+            new Column({name: "local_uri", type: ColumnType.TEXT}),
             new Column({name: "state", type: ColumnType.INTEGER}), // This integer will be mapped to AttachmentState
         ],
     })

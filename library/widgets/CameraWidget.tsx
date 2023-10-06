@@ -27,7 +27,7 @@ export const CameraWidget: React.FC<Props> = props => {
         if (cameraRef.current && ready) {
             setLoading(true);
             const options = {
-                base64: true, quality: 0.5, exif: true,
+                base64: true, quality: 0.5,
                 skipProcessing: isAndroid
             };
             const data = await cameraRef.current.takePictureAsync(options);

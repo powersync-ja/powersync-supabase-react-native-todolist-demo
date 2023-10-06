@@ -28,7 +28,7 @@ export const TodoItemWidget: React.FC<TodoItemWidgetProps> = (props) => {
             >
                 <CameraWidget
                     onCaptured={(data) => {
-                        model.setPhoto(data);
+                        model.savePhoto(data);
                     }}
                     onClose={handleCancel}
                 />
@@ -84,7 +84,7 @@ export const TodoItemWidget: React.FC<TodoItemWidgetProps> = (props) => {
                 {model.record.photo_id == null ? (
                         <Icon name={'camera'} type='font-awesome' onPress={() => setCameraVisible(true)}/>) :
                     <Image
-                        source={{uri: `https://source.unsplash.com/random`}}
+                        source={{uri: model.getPhotoUri()!}}
                         containerStyle={styles.item}
                         PlaceholderContent={<ActivityIndicator/>}
                     />
