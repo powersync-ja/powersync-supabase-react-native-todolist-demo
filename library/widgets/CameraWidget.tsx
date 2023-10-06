@@ -1,30 +1,49 @@
+import {Camera, CameraCapturedPicture, CameraType} from 'expo-camera';
 import React, {useRef} from 'react';
-import {View, TouchableOpacity, Text, StyleSheet} from 'react-native';
-import {Camera, CameraType, CameraCapturedPicture} from 'expo-camera';
-import {Button} from 'react-native-elements';
+import {StyleSheet, Text, TouchableOpacity, View, useWindowDimensions, ActivityIndicator, Platform} from 'react-native';
+import {Button, Icon} from 'react-native-elements';
 
 export interface Props {
-    onCapture: (data: CameraCapturedPicture) => void;
+    onCaptured: (picture: CameraCapturedPicture) => void;
     onClose: () => void;
 }
 
+const isAndroid = Platform.OS === 'android';
+
 export const CameraWidget: React.FC<Props> = props => {
     const cameraRef = useRef<Camera>(null);
-    const [type, setType] = React.useState(CameraType.back);
     const [permission, requestPermission] = Camera.useCameraPermissions();
     const [ready, setReady] = React.useState(false);
+    const [loading, setLoading] = React.useState(false);
 
-    function toggleCameraType() {
-        setType(current => (current === CameraType.back ? CameraType.front : CameraType.back));
-    }
+    // Getting width and height of the screen
+    const {width} = useWindowDimensions();
+    const height = Math.round((width * 16) / 9);
 
-    const takePhoto = async () => {
+    const captureImageAsync = async () => {
+        if (loading) {
+            return;
+        }
         if (cameraRef.current && ready) {
-            const options = {quality: 0.5, base64: true};
+            setLoading(true);
+            const options = {
+                base64: true, quality: 0.5, exif: true,
+                skipProcessing: isAndroid
+            };
             const data = await cameraRef.current.takePictureAsync(options);
-            props.onCapture(data);
+            setLoading(false);
+            props.onCaptured(data);
+            props.onClose()
         }
     };
+
+    const onReady = () => {
+        if (!permission) {
+            requestPermission()
+        } else {
+            setReady(true)
+        }
+    }
 
     if (!permission) {
         // Camera permissions are still loading
@@ -43,13 +62,19 @@ export const CameraWidget: React.FC<Props> = props => {
 
     return (
         <View style={styles.container}>
-            <Camera ref={cameraRef} style={styles.camera} type={type} onCameraReady={() => setReady(true)}>
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={styles.buttonCapture} onPress={takePhoto}>
-                        <Text style={styles.text}>Capture</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.buttonFlip} onPress={toggleCameraType}>
-                        <Text style={styles.text}>Flip Camera</Text>
+            <Camera ref={cameraRef} style={{...styles.camera, height: height, width: '100%'}} type={CameraType.back}
+                    onCameraReady={onReady}
+                    ratio={isAndroid ? '16:9' : undefined}>
+                <TouchableOpacity onPress={props.onClose} style={styles.backButton}>
+                    <Icon name={'chevron-left'} type={'font-awesome'} color={'white'}/>
+                </TouchableOpacity>
+                <View style={styles.bottomCamera}>
+                    <TouchableOpacity
+                        disabled={loading}
+                        style={styles.shutterButton}
+                        onPress={captureImageAsync}
+                    >
+                        <ActivityIndicator animating={loading}/>
                     </TouchableOpacity>
                 </View>
             </Camera>
@@ -63,23 +88,31 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
     },
+    backButton: {
+        position: 'absolute',
+        top: 16,
+        left: 16
+    },
     camera: {
         flex: 1,
     },
-    buttonContainer: {
+    bottomCamera: {
         flex: 1,
-        flexDirection: 'row',
-        backgroundColor: 'transparent',
+        alignSelf: 'stretch',
         alignItems: 'flex-end',
-        margin: 64,
+        justifyContent: 'center',
+        flexDirection: 'row',
+        columnGap: 30,
+        backgroundColor: 'transparent',
     },
-    buttonCapture: {
-        flex: 1,
-        alignItems: 'center'
-    },
-    buttonFlip: {
-        flex: 1,
+    shutterButton: {
+        width: 70,
+        height: 70,
+        bottom: 15,
+        borderRadius: 50,
+        backgroundColor: '#ffffff',
         alignItems: 'center',
+        justifyContent: 'center',
     },
     text: {
         fontSize: 24,

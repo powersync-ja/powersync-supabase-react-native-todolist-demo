@@ -1,6 +1,6 @@
 import React from "react";
 import {ActivityIndicator, Alert, View, Modal, StyleSheet,} from "react-native";
-import {ListItem, Button, Icon, Image} from "react-native-elements";
+import {ListItem, Button, Icon, Image,} from "react-native-elements";
 import {TodoModel} from "../models/TodoModel";
 import {CameraWidget} from "./CameraWidget";
 
@@ -27,9 +27,8 @@ export const TodoItemWidget: React.FC<TodoItemWidgetProps> = (props) => {
                 onRequestClose={handleCancel}
             >
                 <CameraWidget
-                    onCapture={(data) => {
+                    onCaptured={(data) => {
                         model.setPhoto(data);
-                        handleCancel();
                     }}
                     onClose={handleCancel}
                 />

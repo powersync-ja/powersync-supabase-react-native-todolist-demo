@@ -71,7 +71,8 @@ export class TodoModel extends AbstractModel<TodoRecord> {
         this.system.todoStore.removeModel(this);
     }
 
-    setPhoto(data: CameraCapturedPicture) {
-        console.log(JSON.stringify(data, null, 2));
+    async setPhoto(data: CameraCapturedPicture) {
+        console.log('New photo uri', data.uri);
+
     }
 }
