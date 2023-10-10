@@ -7,8 +7,8 @@ import {
 
 import {SupabaseClient, createClient} from '@supabase/supabase-js';
 import {AppConfig} from './AppConfig';
-import {KVStorage} from './KVStorage';
 import {SupabaseStorageAdapter} from "./SupabaseStorageAdapter";
+import {System} from '../stores/system';
 
 /// Postgres Response codes that we cannot recover from by retrying.
 const FATAL_RESPONSE_CODES = [
@@ -23,21 +23,21 @@ const FATAL_RESPONSE_CODES = [
 ];
 
 export class SupabaseConnector implements PowerSyncBackendConnector {
-    supabaseClient: SupabaseClient;
-    supabaseStorageAdapter: SupabaseStorageAdapter;
+    client: SupabaseClient;
+    storage: SupabaseStorageAdapter;
 
-    constructor() {
-        this.supabaseClient = createClient(AppConfig.supabaseUrl, AppConfig.supabaseAnonKey, {
+    constructor(protected system: System) {
+        this.client = createClient(AppConfig.supabaseUrl, AppConfig.supabaseAnonKey, {
             auth: {
                 persistSession: true,
-                storage: KVStorage
+                storage: this.system.kvStorage
             }
         });
-        this.supabaseStorageAdapter = new SupabaseStorageAdapter({supabaseClient: this.supabaseClient});
+        this.storage = new SupabaseStorageAdapter({client: this.client});
     }
 
     async login(username: string, password: string) {
-        const {data, error} = await this.supabaseClient.auth.signInWithPassword({
+        const {data, error} = await this.client.auth.signInWithPassword({
             email: username,
             password: password
         });
@@ -51,7 +51,7 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
         const {
             data: {session},
             error
-        } = await this.supabaseClient.auth.getSession();
+        } = await this.client.auth.getSession();
 
         if (!session || error) {
             throw new Error(`Could not fetch Supabase credentials: ${error}`);
@@ -60,7 +60,7 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
         console.debug('session expires at', session.expires_at);
 
         return {
-            client: this.supabaseClient,
+            client: this.client,
             endpoint: AppConfig.powersyncUrl,
             token: session.access_token ?? '',
             expiresAt: session.expires_at ? new Date(session.expires_at * 1000) : undefined,
@@ -81,7 +81,7 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
             // or edge functions to process the entire transaction in a single call.
             for (let op of transaction.crud) {
                 lastOp = op;
-                const table = this.supabaseClient.from(op.table);
+                const table = this.client.from(op.table);
                 switch (op.op) {
                     case UpdateType.PUT:
                         const record = {...op.opData, id: op.id};

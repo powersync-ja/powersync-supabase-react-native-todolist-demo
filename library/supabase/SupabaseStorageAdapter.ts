@@ -1,42 +1,50 @@
 import {SupabaseClient} from "@supabase/supabase-js";
-import {FileOptions} from "@supabase/storage-js";
-import {decode} from 'base64-arraybuffer'
+import {
+    AbstractStorageAdapter,
+    BaseStorageAdapterOptions,
+    StorageOptions,
+    UploadOptions
+} from "../storage/AbstractStorageAdapter";
 
-export interface SupabaseStorageAdapterOptions {
-    supabaseClient: SupabaseClient;
-    storageBucket?: string;
+export interface SupabaseStorageAdapterOptions extends BaseStorageAdapterOptions {
+    client: SupabaseClient;
 }
 
-export class SupabaseStorageAdapter {
+export class SupabaseStorageAdapter extends AbstractStorageAdapter<SupabaseStorageAdapterOptions> {
     static BUCKET_NAME = 'media';
-    options: SupabaseStorageAdapterOptions
 
     constructor(options: SupabaseStorageAdapterOptions) {
-        this.options = {storageBucket: SupabaseStorageAdapter.BUCKET_NAME, ...options};
+        super(options);
     }
 
-    async uploadFile(filename: string, data: ArrayBuffer, options: {
-        bucket?: string,
-        fileOptions?: FileOptions
-    } = {}): Promise<boolean> {
-        const bucket = options.bucket ?? this.options.storageBucket!;
-        const res = await this.options.supabaseClient
+    async uploadFile(filename: string, data: ArrayBuffer, options: UploadOptions): Promise<void> {
+        const bucket = options.bucket ?? SupabaseStorageAdapter.BUCKET_NAME;
+
+        const res = await this.options.client
             .storage
             .from(bucket)
-            .upload(filename, data, options.fileOptions)
+            .upload(filename, data, {contentType: options.mediaType})
 
         if (res.error) {
             console.error('Error uploading file', res.error);
-            return false;
+            return;
         }
-        return true;
     }
 
-    /**
-     * Converts a base64 string to an ArrayBuffer
-     */
-    toArrayBuffer(base64: string): ArrayBuffer {
-        return decode(base64);
+    async downloadFile(filePath: string, options?: StorageOptions): Promise<Blob> {
+        const bucket = options?.bucket ?? SupabaseStorageAdapter.BUCKET_NAME;
+
+        const {data, error} = await this.options.client
+            .storage
+            .from(bucket)
+            .download(filePath)
+
+        if (error) {
+            console.error('Error downloading file', error);
+            throw error;
+        }
+
+        return data
     }
 
 }

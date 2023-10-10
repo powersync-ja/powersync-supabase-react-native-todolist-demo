@@ -4,7 +4,7 @@ import {StyleSheet, Text, TouchableOpacity, View, useWindowDimensions, ActivityI
 import {Button, Icon} from 'react-native-elements';
 
 export interface Props {
-    onCaptured: (picture: CameraCapturedPicture) => void;
+    onCaptured: (photo: CameraCapturedPicture) => void;
     onClose: () => void;
 }
 
@@ -27,12 +27,13 @@ export const CameraWidget: React.FC<Props> = props => {
         if (cameraRef.current && ready) {
             setLoading(true);
             const options = {
-                base64: true, quality: 0.5,
+                base64: true,
+                quality: 0.5,
                 skipProcessing: isAndroid
             };
-            const data = await cameraRef.current.takePictureAsync(options);
+            const photo = await cameraRef.current.takePictureAsync(options);
             setLoading(false);
-            props.onCaptured(data);
+            props.onCaptured(photo);
             props.onClose()
         }
     };

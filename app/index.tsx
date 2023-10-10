@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { ActivityIndicator, View } from 'react-native';
-import { observer } from 'mobx-react-lite';
+import {ActivityIndicator, View} from 'react-native';
+import {observer} from 'mobx-react-lite';
 
-import { useSystem } from '../library/stores/system';
-import { router } from 'expo-router';
+import {useSystem} from '../library/stores/system';
+import {router} from 'expo-router';
 import Logger from 'js-logger';
+
 /**
  * This is the entry point when the app loads.
  * Checks for a Supabase session.
@@ -12,30 +13,30 @@ import Logger from 'js-logger';
  *  - If not, reditect to login/register flow
  */
 const App = observer(() => {
-  const { supabaseConnector } = useSystem();
+    const {supabaseConnector} = useSystem();
 
-  React.useEffect(() => {
-    Logger.useDefaults();
-    Logger.setLevel(Logger.DEBUG);
-    supabaseConnector.supabaseClient.auth
-      .getSession()
-      .then(({ data, error }) => {
-        if (data.session) {
-          router.replace('views/todos/lists');
-        } else {
-          throw new Error('Signin required');
-        }
-      })
-      .catch(() => {
-        router.replace('signin');
-      });
-  }, []);
+    React.useEffect(() => {
+        Logger.useDefaults();
+        Logger.setLevel(Logger.DEBUG);
+        supabaseConnector.client.auth
+            .getSession()
+            .then(({data, error}) => {
+                if (data.session) {
+                    router.replace('views/todos/lists');
+                } else {
+                    throw new Error('Signin required');
+                }
+            })
+            .catch(() => {
+                router.replace('signin');
+            });
+    }, []);
 
-  return (
-    <View style={{ flex: 1, flexGrow: 1, alignContent: 'center', justifyContent: 'center' }}>
-      <ActivityIndicator />
-    </View>
-  );
+    return (
+        <View style={{flex: 1, flexGrow: 1, alignContent: 'center', justifyContent: 'center'}}>
+            <ActivityIndicator/>
+        </View>
+    );
 });
 
 export default App;

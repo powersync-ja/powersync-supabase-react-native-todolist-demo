@@ -1,11 +1,12 @@
-import _ from "lodash";
-import {action, makeObservable, observable} from "mobx";
-import {AbstractModel, ModelRecord} from "./AbstractModel";
 import {Transaction} from "@journeyapps/powersync-sdk-react-native";
 import {CameraCapturedPicture} from 'expo-camera';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from "expo-file-system";
+import _ from "lodash";
+import {action, makeObservable, observable} from "mobx";
 import {v4 as uuid} from 'uuid'
+import {AttachmentEntry} from "../attachments/Attachment";
 import {System} from "../stores/system";
+import {AbstractModel, ModelRecord} from "./AbstractModel";
 
 export interface TodoRecord extends ModelRecord {
     created_at: string;
@@ -28,10 +29,6 @@ export class TodoModel extends AbstractModel<TodoRecord> {
 
     constructor(public record: TodoRecord, protected system: System) {
         super(record, system);
-        makeObservable(this, {
-            record: observable,
-            update: action
-        });
     }
 
     get table() {
@@ -80,9 +77,7 @@ export class TodoModel extends AbstractModel<TodoRecord> {
     }
 
     async _delete(tx: Transaction): Promise<void> {
-        if (this.record.photo_id) {
-            await this.system.attachmentQueue.delete(this.record.photo_id);
-        }
+
         await tx.executeAsync(
             `DELETE
                        FROM ${this.table}
@@ -92,32 +87,62 @@ export class TodoModel extends AbstractModel<TodoRecord> {
         this.system.todoStore.removeModel(this);
     }
 
-    async savePhoto(data: CameraCapturedPicture) {
+    async deletePhoto(tx?: Transaction) {
+        const {photo_id} = this.record;
+        if (!photo_id) {
+            return;
+        }
+        const _deletePhoto = async (tx: Transaction) => {
+            const photoRecord = await this.system.attachmentQueue.getEntry(photo_id);
+            if (photoRecord) {
+                await this.system.attachmentQueue.delete(photo_id, tx);
+                await this.system.storage.deleteFile(photoRecord.local_uri)
+            }
+        }
+        if (tx) {
+            return _deletePhoto(tx)
+        }
+        return this.system.powersync.writeTransaction((tx) => _deletePhoto(tx));
+    }
 
+    async savePhoto(data: CameraCapturedPicture) {
         const photoId = uuid();
-        const newPhotoUri = this.getPhotoUri(photoId);
+        const filename = `${photoId}.jpg`;
+
+        const entry: AttachmentEntry = {
+            id: photoId,
+            filename,
+            local_uri: this.getPhotoUri(filename)!,
+            media_type: "image/jpeg"
+        }
 
         await this.update({
             photo_id: photoId
         });
 
-        const {exists} = await FileSystem.getInfoAsync(TODO_LOCAL_STORAGE_PATH)
-        if (!exists) {
-            await FileSystem.makeDirectoryAsync(TODO_LOCAL_STORAGE_PATH, {intermediates: true})
-        }
-
+        await this.system.storage.makeDir(TODO_LOCAL_STORAGE_PATH);
         //Copy photo from temp to local storage
-        await FileSystem.copyAsync({from: data.uri, to: newPhotoUri!});
+        await this.system.storage.copyFile(data.uri, entry.local_uri!);
+
+        const fileInfo = await FileSystem.getInfoAsync(entry.local_uri!);
+        if (fileInfo.exists) {
+            entry.size = fileInfo.size;
+        } else {
+            throw new Error(`File does not exist: ${entry.local_uri}`)
+        }
 
         //Enqueue attachment
-        await this.system.attachmentQueue.enqueue({id: photoId, localUri: newPhotoUri!});
+        await this.system.attachmentQueue.enqueue(entry);
     }
 
-    getPhotoUri(id?: string): string {
-        if (!id && !this.record.photo_id) {
-            throw new Error('No photo id specified');
+    getPhotoUri(filename?: string): string | null {
+        if (!filename) {
+            if (this.record.photo_id) {
+                filename = `${this.record.photo_id}.jpg`;
+            } else {
+                return null;
+            }
         }
-        const photoId = id || this.record.photo_id;
-        return `${TODO_LOCAL_STORAGE_PATH}/${photoId}.jpg`;
+        return `${TODO_LOCAL_STORAGE_PATH}/${filename}`;
     }
 }

@@ -7,12 +7,6 @@ import {
     Table,
 } from "@journeyapps/powersync-sdk-react-native";
 
-export enum AttachmentState {
-    QUEUED = 0,
-    UPLOADED = 1,
-    FAILED = 2,
-}
-
 export const AppSchema = new Schema([
     new Table({
         name: "todos",
@@ -46,8 +40,12 @@ export const AppSchema = new Schema([
     Table.createLocalOnly({
         name: "upload_queue",
         columns: [
+            new Column({name: "filename", type: ColumnType.TEXT}),
             new Column({name: "local_uri", type: ColumnType.TEXT}),
+            new Column({name: "size", type: ColumnType.INTEGER}),
             new Column({name: "state", type: ColumnType.INTEGER}), // This integer will be mapped to AttachmentState
+            new Column({name: "timestamp", type: ColumnType.INTEGER}),
+            new Column({name: "media_type", type: ColumnType.TEXT}),
         ],
     })
 ]);

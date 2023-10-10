@@ -32,7 +32,7 @@ const TodoView = observer(() => {
     }
 
     return (
-        <View style={{flexGrow: 1}}>
+        <View key={`$edit-${id}`} style={{flexGrow: 1}}>
             <Stack.Screen
                 options={{
                     title: listModel.record.name
@@ -62,7 +62,7 @@ const TodoView = observer(() => {
                     );
                 }}
             />
-            <ScrollView key={`edit-view`} style={{maxHeight: '90%'}}>
+            <ScrollView key={`edit-view-${id}`} style={{maxHeight: '90%'}}>
                 {listModel.todos.map((t) => {
                     return <TodoItemWidget key={t.id} model={t}/>;
                 })}

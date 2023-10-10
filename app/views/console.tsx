@@ -29,7 +29,7 @@ const App = () => {
     const cellKeys = firstItem ? Object.keys(firstItem) : [];
 
     return (
-        <ScrollView style={{flex: 1, flexGrow: 1}}>
+        <ScrollView key={'console'} style={{flex: 1, flexGrow: 1}}>
             <TextInput defaultValue={DEFAULT_QUERY} onChangeText={executeQuery}/>
             {output ? (
                 <Table borderStyle={{borderWidth: 2}}>
