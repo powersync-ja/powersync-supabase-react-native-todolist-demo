@@ -31,10 +31,15 @@ export abstract class AbstractModel<Record extends ModelRecord = ModelRecord> {
      * Removes a model from the DB. Takes an optional transaction.
      */
     async delete(tx?: Transaction) {
-        if (tx) {
-            return this._delete(tx);
+        try {
+            if (tx) {
+                return this._delete(tx);
+            }
+            return this.system.powersync.writeTransaction((tx) => this._delete(tx));
+        } catch (e) {
+            console.log(e);
+            throw e;
         }
-        return this.system.powersync.writeTransaction((tx) => this._delete(tx));
     }
 
     protected abstract _delete(tx: Transaction): Promise<void>;

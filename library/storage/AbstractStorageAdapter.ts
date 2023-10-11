@@ -22,21 +22,15 @@ export abstract class AbstractStorageAdapter<T extends BaseStorageAdapterOptions
 
     abstract downloadFile(filePath: string, options?: StorageOptions): Promise<Blob>;
 
-    async writeFile(fileURI: string, data: Blob, options: {
-        encoding: EncodingType
-    }): Promise<void> {
-        const content = await data.text();
-
-        // TODO: Check if target filePath is external and has permissions
-        return writeAsStringAsync(fileURI, content, options)
+    async fileExists(fileURI: string): Promise<boolean> {
+        const {exists} = await FileSystem.getInfoAsync(fileURI);
+        return exists;
     }
 
-    async writeFileToCache(filename: string, data: Blob, options: {
+    async writeFile(fileURI: string, base64Data: string, options: {
         encoding: EncodingType
-        dirName?: string,
     }): Promise<void> {
-        const uri = `${cacheDirectory}${options.dirName ?? ''}${filename}`;
-        return this.writeFile(uri, data, options);
+        await FileSystem.writeAsStringAsync(fileURI, base64Data, options);
     }
 
     async readFile(fileURI: string, options: { encoding: EncodingType, mediaType?: string }): Promise<ArrayBuffer> {
@@ -66,8 +60,7 @@ export abstract class AbstractStorageAdapter<T extends BaseStorageAdapterOptions
         if (uri == null) {
             return
         }
-        const fileInfo = await FileSystem.getInfoAsync(uri);
-        if (fileInfo.exists) {
+        if (await this.fileExists(uri)) {
             await FileSystem.deleteAsync(uri);
         }
     }

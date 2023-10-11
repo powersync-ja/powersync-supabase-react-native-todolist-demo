@@ -38,7 +38,7 @@ export const AppSchema = new Schema([
 
     // Attachment table
     Table.createLocalOnly({
-        name: "upload_queue",
+        name: "attachments",
         columns: [
             new Column({name: "filename", type: ColumnType.TEXT}),
             new Column({name: "local_uri", type: ColumnType.TEXT}),

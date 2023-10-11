@@ -24,7 +24,8 @@ export default function Signin() {
                     <TextInputWidget
                         style={SignInStyles.input}
                         inputMode={"email"}
-                        placeholder="Username"
+                        placeholder={"Username"}
+                        autoCapitalize={'none'}
                         onChangeText={(value) => setCredentials({...credentials, username: value.toLowerCase().trim()})}
                     />
                     <TextInputWidget

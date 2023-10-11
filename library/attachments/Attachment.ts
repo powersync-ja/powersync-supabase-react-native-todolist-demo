@@ -7,7 +7,7 @@ export enum AttachmentState {
 export interface AttachmentEntry {
     id: string;
     filename: string;
-    local_uri?: string;
+    local_uri: string;
     size?: number;
     media_type?: string;
 }

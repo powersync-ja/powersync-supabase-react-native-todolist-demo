@@ -26,12 +26,11 @@ export class SupabaseStorageAdapter extends AbstractStorageAdapter<SupabaseStora
             .upload(filename, data, {contentType: options.mediaType})
 
         if (res.error) {
-            console.error('Error uploading file', res.error);
-            return;
+            throw res.error;
         }
     }
 
-    async downloadFile(filePath: string, options?: StorageOptions): Promise<Blob> {
+    async downloadFile(filePath: string, options?: StorageOptions) {
         const bucket = options?.bucket ?? SupabaseStorageAdapter.BUCKET_NAME;
 
         const {data, error} = await this.options.client
@@ -40,11 +39,10 @@ export class SupabaseStorageAdapter extends AbstractStorageAdapter<SupabaseStora
             .download(filePath)
 
         if (error) {
-            console.error('Error downloading file', error);
             throw error;
         }
 
-        return data
+        return data as Blob;
     }
 
 }

@@ -67,5 +67,8 @@ export class System {
 
 export const system = new System();
 
+// TODO remove
+(window as any).__system = system;
+
 export const SystemContext = React.createContext(system);
 export const useSystem = () => React.useContext(SystemContext);

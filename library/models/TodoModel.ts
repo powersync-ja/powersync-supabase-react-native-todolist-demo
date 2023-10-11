@@ -2,7 +2,6 @@ import {Transaction} from "@journeyapps/powersync-sdk-react-native";
 import {CameraCapturedPicture} from 'expo-camera';
 import * as FileSystem from "expo-file-system";
 import _ from "lodash";
-import {action, makeObservable, observable} from "mobx";
 import {v4 as uuid} from 'uuid'
 import {AttachmentEntry} from "../attachments/Attachment";
 import {System} from "../stores/system";
@@ -29,6 +28,7 @@ export class TodoModel extends AbstractModel<TodoRecord> {
 
     constructor(public record: TodoRecord, protected system: System) {
         super(record, system);
+        this.checkPhoto();
     }
 
     get table() {
@@ -77,13 +77,13 @@ export class TodoModel extends AbstractModel<TodoRecord> {
     }
 
     async _delete(tx: Transaction): Promise<void> {
-
         await tx.executeAsync(
             `DELETE
                        FROM ${this.table}
                    WHERE id = ?`,
             [this.id]
         );
+        await this.deletePhoto(tx);
         this.system.todoStore.removeModel(this);
     }
 
@@ -93,10 +93,11 @@ export class TodoModel extends AbstractModel<TodoRecord> {
             return;
         }
         const _deletePhoto = async (tx: Transaction) => {
-            const photoRecord = await this.system.attachmentQueue.getEntry(photo_id);
+            const photoRecord = await this.system.attachmentQueue.getEntry(photo_id, tx);
             if (photoRecord) {
                 await this.system.attachmentQueue.delete(photo_id, tx);
                 await this.system.storage.deleteFile(photoRecord.local_uri)
+                //todo delete from supabase
             }
         }
         if (tx) {
@@ -144,5 +145,26 @@ export class TodoModel extends AbstractModel<TodoRecord> {
             }
         }
         return `${TODO_LOCAL_STORAGE_PATH}/${filename}`;
+    }
+
+    async checkPhoto() {
+        const photoId = this.record.photo_id;
+        if (!photoId) {
+            return;
+        }
+
+        const filename = `${photoId}.jpg`;
+        const photoUri = this.getPhotoUri(filename);
+        if (await this.system.storage.fileExists(photoUri!)) {
+            return;
+        }
+        await this.system.storage.makeDir(TODO_LOCAL_STORAGE_PATH);
+        
+        await this.system.attachmentQueue.enqueue({
+            id: photoId,
+            filename,
+            local_uri: photoUri!,
+            media_type: "image/jpeg"
+        });
     }
 }
