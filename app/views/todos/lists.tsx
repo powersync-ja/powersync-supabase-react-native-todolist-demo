@@ -15,7 +15,7 @@ const App = observer(() => {
     <View style={{ flex: 1, flexGrow: 1 }}>
       <Stack.Screen
         options={{
-          headerShown: false
+          headerShown: false,
         }}
       />
       <FAB
@@ -33,7 +33,7 @@ const App = observer(() => {
               }
 
               listStore.createModel({
-                name: text
+                name: text,
               });
             },
             { placeholder: 'List name', style: 'shimo' }

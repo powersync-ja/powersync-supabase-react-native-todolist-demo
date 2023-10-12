@@ -18,20 +18,20 @@ const HomeLayout = () => {
         name="console"
         options={{
           drawerLabel: 'SQL Console',
-          title: 'SQL Console'
+          title: 'SQL Console',
         }}
       />
       <Drawer.Screen
         name="todos"
         options={{
           drawerLabel: 'Todo Lists',
-          title: 'Todo Lists'
+          title: 'Todo Lists',
         }}
       />
       <Drawer.Screen
         name="signout"
         options={{
-          drawerLabel: 'Sign Out'
+          drawerLabel: 'Sign Out',
         }}
       />
     </Drawer>

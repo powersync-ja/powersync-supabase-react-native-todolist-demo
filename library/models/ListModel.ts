@@ -1,9 +1,9 @@
-import _ from "lodash";
-import { AbstractModel, ModelRecord } from "./AbstractModel";
-import { computed, makeObservable } from "mobx";
-import { Transaction } from "@journeyapps/powersync-sdk-react-native";
-import { TodoModel } from "./TodoModel";
-import { System } from "../stores/system";
+import _ from 'lodash';
+import { AbstractModel, ModelRecord } from './AbstractModel';
+import { computed, makeObservable } from 'mobx';
+import { Transaction } from '@journeyapps/powersync-sdk-react-native';
+import { TodoModel } from './TodoModel';
+import { System } from '../stores/system';
 
 export interface ListRecord extends ModelRecord {
   name: string;
@@ -11,10 +11,13 @@ export interface ListRecord extends ModelRecord {
   owner_id: string;
 }
 
-export const LIST_TABLE = "lists";
+export const LIST_TABLE = 'lists';
 
 export class ListModel extends AbstractModel<ListRecord> {
-  constructor(public record: ListRecord, protected system: System) {
+  constructor(
+    public record: ListRecord,
+    protected system: System
+  ) {
     super(record, system);
 
     makeObservable(this, {
@@ -28,20 +31,14 @@ export class ListModel extends AbstractModel<ListRecord> {
   }
 
   get todos(): TodoModel[] {
-    return this.system.todoStore.collection.filter(
-      (todo) => todo.record.list_id == this.id
-    );
+    return this.system.todoStore.collection.filter((todo) => todo.record.list_id == this.id);
   }
 
   get description() {
     const todos = this.todos;
-    const completedCount = _.sumBy(todos, (todo) =>
-      todo.record.completed ? 1 : 0
-    );
+    const completedCount = _.sumBy(todos, (todo) => (todo.record.completed ? 1 : 0));
 
-    return `${
-      todos.length - completedCount
-    } pending, ${completedCount} completed`;
+    return `${todos.length - completedCount} pending, ${completedCount} completed`;
   }
 
   async update(record: ListRecord): Promise<void> {

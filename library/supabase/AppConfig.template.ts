@@ -4,5 +4,5 @@
 export const AppConfig = {
   supabaseUrl: '',
   supabaseAnonKey: '',
-  powersyncUrl: ''
+  powersyncUrl: '',
 };
