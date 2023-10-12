@@ -42,10 +42,11 @@ export const AppSchema = new Schema([
         columns: [
             new Column({name: "filename", type: ColumnType.TEXT}),
             new Column({name: "local_uri", type: ColumnType.TEXT}),
-            new Column({name: "size", type: ColumnType.INTEGER}),
-            new Column({name: "state", type: ColumnType.INTEGER}), // This integer will be mapped to AttachmentState
             new Column({name: "timestamp", type: ColumnType.INTEGER}),
+            new Column({name: "size", type: ColumnType.INTEGER}),
             new Column({name: "media_type", type: ColumnType.TEXT}),
+            new Column({name: "queued", type: ColumnType.INTEGER}),
+            new Column({name: "synced", type: ColumnType.INTEGER}),
         ],
     })
 ]);

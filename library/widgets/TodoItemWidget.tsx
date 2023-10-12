@@ -17,11 +17,6 @@ export const TodoItemWidget: React.FC<TodoItemWidgetProps> = (props) => {
         setCameraVisible(false);
     };
 
-    React.useEffect(() => {
-        model.checkPhoto();
-    }, [])
-
-
     return (
         <View key={`todo-item-${model.id}`} style={{padding: 10}}>
             <Modal

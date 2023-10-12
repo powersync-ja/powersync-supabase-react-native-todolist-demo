@@ -22,11 +22,6 @@ export abstract class AbstractStorageAdapter<T extends BaseStorageAdapterOptions
 
     abstract downloadFile(filePath: string, options?: StorageOptions): Promise<Blob>;
 
-    async fileExists(fileURI: string): Promise<boolean> {
-        const {exists} = await FileSystem.getInfoAsync(fileURI);
-        return exists;
-    }
-
     async writeFile(fileURI: string, base64Data: string, options: {
         encoding: EncodingType
     }): Promise<void> {
@@ -43,6 +38,11 @@ export abstract class AbstractStorageAdapter<T extends BaseStorageAdapterOptions
             return base64ToArrayBuffer(fileContent);
         }
         return stringToArrayBuffer(fileContent);
+    }
+
+    async fileExists(fileURI: string): Promise<boolean> {
+        const {exists} = await FileSystem.getInfoAsync(fileURI);
+        return exists;
     }
 
     async makeDir(uri: string): Promise<void> {

@@ -107,44 +107,26 @@ export class TodoModel extends AbstractModel<TodoRecord> {
     }
 
     async savePhoto(data: CameraCapturedPicture) {
-        const photoId = uuid();
-        const filename = `${photoId}.jpg`;
 
-        const entry: AttachmentEntry = {
-            id: photoId,
-            filename,
-            local_uri: this.getPhotoUri(filename)!,
-            media_type: "image/jpeg"
-        }
+        const photoId = uuid();
+        const entry = await this.newPhotoEntry(photoId);
 
         await this.update({
             photo_id: photoId
         });
 
-        await this.system.storage.makeDir(TODO_LOCAL_STORAGE_PATH);
+        const {local_uri, filename} = entry;
+        await this.system.storage.makeDir(local_uri.replace(filename, ""));
         //Copy photo from temp to local storage
         await this.system.storage.copyFile(data.uri, entry.local_uri!);
 
         const fileInfo = await FileSystem.getInfoAsync(entry.local_uri!);
         if (fileInfo.exists) {
             entry.size = fileInfo.size;
-        } else {
-            throw new Error(`File does not exist: ${entry.local_uri}`)
         }
 
         //Enqueue attachment
-        await this.system.attachmentQueue.enqueue(entry);
-    }
-
-    getPhotoUri(filename?: string): string | null {
-        if (!filename) {
-            if (this.record.photo_id) {
-                filename = `${this.record.photo_id}.jpg`;
-            } else {
-                return null;
-            }
-        }
-        return `${TODO_LOCAL_STORAGE_PATH}/${filename}`;
+        await this.system.attachmentQueue.saveToQueue(entry);
     }
 
     async checkPhoto() {
@@ -153,18 +135,36 @@ export class TodoModel extends AbstractModel<TodoRecord> {
             return;
         }
 
-        const filename = `${photoId}.jpg`;
-        const photoUri = this.getPhotoUri(filename);
-        if (await this.system.storage.fileExists(photoUri!)) {
-            return;
+        const entry = await this.newPhotoEntry(photoId);
+
+        const fileInfo = await FileSystem.getInfoAsync(entry.local_uri!);
+        if (fileInfo.exists) {
+            entry.size = fileInfo.size;
         }
-        await this.system.storage.makeDir(TODO_LOCAL_STORAGE_PATH);
-        
-        await this.system.attachmentQueue.enqueue({
+
+        return this.system.attachmentQueue.saveToQueue(entry, {queue: fileInfo.exists})
+    }
+
+    async newPhotoEntry(photoId: string): Promise<AttachmentEntry> {
+        const filename = `${photoId}.jpg`;
+        const fileUri = this.getPhotoUri(filename);
+
+        return {
             id: photoId,
             filename,
-            local_uri: photoUri!,
+            local_uri: fileUri!,
             media_type: "image/jpeg"
-        });
+        }
+    }
+
+    getPhotoUri(filename?: string) {
+        if (!filename) {
+            if (this.record.photo_id) {
+                filename = `${this.record.photo_id}.jpg`;
+            } else {
+                return null;
+            }
+        }
+        return `${TODO_LOCAL_STORAGE_PATH}/${filename}`;
     }
 }

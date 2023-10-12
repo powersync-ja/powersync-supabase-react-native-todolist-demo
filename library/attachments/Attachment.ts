@@ -1,9 +1,3 @@
-export enum AttachmentState {
-    QUEUED = 0,
-    UPLOADED = 1,
-    SYNCED = 2,
-}
-
 export interface AttachmentEntry {
     id: string;
     filename: string;
@@ -14,5 +8,6 @@ export interface AttachmentEntry {
 
 export interface AttachmentRecord extends AttachmentEntry {
     timestamp: number,
-    state: AttachmentState;
+    queued: number, // 0 = not queued, 1 = queued
+    synced: number, // 0 = not synced, 1 = synced
 }
