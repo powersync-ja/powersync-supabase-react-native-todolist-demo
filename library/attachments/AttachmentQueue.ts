@@ -53,7 +53,7 @@ export class AttachmentQueue extends BaseObserver<AttachmentQueueListener> {
           filename: row.filename,
           local_uri: row.local_uri,
           size: row.size,
-          media_type: row.media_type,
+          media_type: row.media_type
         }
       : null;
   }
@@ -79,7 +79,7 @@ export class AttachmentQueue extends BaseObserver<AttachmentQueueListener> {
         record.media_type,
         record.queued,
         record.synced,
-        record.id,
+        record.id
       ]
     );
   }
@@ -113,7 +113,7 @@ export class AttachmentQueue extends BaseObserver<AttachmentQueueListener> {
       ...entry,
       timestamp: new Date().getTime(),
       queued: options.queue === false ? 0 : 1,
-      synced: options.sync ? 1 : 0,
+      synced: options.sync ? 1 : 0
     };
 
     await this.system.powersync.execute(
@@ -126,7 +126,7 @@ export class AttachmentQueue extends BaseObserver<AttachmentQueueListener> {
         record.media_type || null,
         record.size || null,
         record.queued,
-        record.synced,
+        record.synced
       ]
     );
 
@@ -146,7 +146,7 @@ export class AttachmentQueue extends BaseObserver<AttachmentQueueListener> {
             filename: row.filename,
             local_uri: row.local_uri,
             size: row.size,
-            media_type: row.media_type,
+            media_type: row.media_type
           }
         : null;
     } catch (e) {
@@ -167,7 +167,7 @@ export class AttachmentQueue extends BaseObserver<AttachmentQueueListener> {
       filename: row.filename,
       local_uri: row.local_uri,
       size: row.size,
-      media_type: row.media_type,
+      media_type: row.media_type
     }));
   }
 
@@ -183,7 +183,7 @@ export class AttachmentQueue extends BaseObserver<AttachmentQueueListener> {
     try {
       const fileBuffer = await this.system.storage.readFile(entry.local_uri, {
         encoding: EncodingType.Base64,
-        mediaType: entry.media_type,
+        mediaType: entry.media_type
       });
 
       const options: UploadOptions = {};
@@ -312,7 +312,7 @@ export class AttachmentQueue extends BaseObserver<AttachmentQueueListener> {
           onUploadComplete: () => {
             l();
             resolve();
-          },
+          }
         });
       });
     }

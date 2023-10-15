@@ -3,7 +3,7 @@ import { CameraCapturedPicture } from 'expo-camera';
 import * as FileSystem from 'expo-file-system';
 import _ from 'lodash';
 import { v4 as uuid } from 'uuid';
-import { AttachmentEntry } from '../attachments/Attachment';
+import { AttachmentEntry, AttachmentRecord } from '../attachments/Attachment';
 import { System } from '../stores/system';
 import { AbstractModel, ModelRecord } from './AbstractModel';
 
@@ -25,11 +25,14 @@ export const TODO_LOCAL_STORAGE_KEY = 'todo_photos';
 export const TODO_LOCAL_STORAGE_PATH = `${FileSystem.documentDirectory}${TODO_LOCAL_STORAGE_KEY}`;
 
 export class TodoModel extends AbstractModel<TodoRecord> {
+  photoRecord?: AttachmentRecord;
+
   constructor(
     public record: TodoRecord,
     protected system: System
   ) {
     super(record, system);
+
     this.checkPhoto();
   }
 
@@ -59,7 +62,7 @@ export class TodoModel extends AbstractModel<TodoRecord> {
         updatedRecord.completed_by,
         updatedRecord.list_id,
         updatedRecord.photo_id,
-        this.id,
+        this.id
       ]
     );
     this.record = updatedRecord;
@@ -67,7 +70,7 @@ export class TodoModel extends AbstractModel<TodoRecord> {
 
   async toggleCompletion(completed: boolean) {
     const updatedRecord: Partial<TodoRecord> = {
-      completed,
+      completed
     };
     if (completed) {
       const { userID } = await this.system.supabaseConnector.fetchCredentials();
@@ -99,7 +102,7 @@ export class TodoModel extends AbstractModel<TodoRecord> {
       if (photoRecord) {
         await this.system.attachmentQueue.delete(photo_id, tx);
         await this.system.storage.deleteFile(photoRecord.local_uri);
-        //todo delete from supabase
+        //TODO delete from Supabase
       }
     };
     if (tx) {
@@ -113,7 +116,7 @@ export class TodoModel extends AbstractModel<TodoRecord> {
     const entry = await this.newPhotoEntry(photoId);
 
     await this.update({
-      photo_id: photoId,
+      photo_id: photoId
     });
 
     const { local_uri, filename } = entry;
@@ -154,7 +157,7 @@ export class TodoModel extends AbstractModel<TodoRecord> {
       id: photoId,
       filename,
       local_uri: fileUri!,
-      media_type: 'image/jpeg',
+      media_type: 'image/jpeg'
     };
   }
 
