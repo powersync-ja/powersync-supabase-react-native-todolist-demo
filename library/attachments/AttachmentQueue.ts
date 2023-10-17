@@ -84,15 +84,16 @@ export class AttachmentQueue extends BaseObserver<AttachmentQueueListener> {
     return this.system.powersync.getOptional<AttachmentRecord>(`SELECT * FROM ${this.table} WHERE id = ?`, [id]);
   }
 
-  async delete(id: string, tx: Transaction): Promise<void> {
+  async delete(record: AttachmentRecord, tx: Transaction): Promise<void> {
     await tx.executeAsync(
       `DELETE
              FROM ${this.table}
              WHERE id = ?`,
-      [id]
+      [record.id]
     );
 
-    // TODO: delete file on storage
+    // Delete file on storage
+    return this.system.storage.deleteFile(record.local_uri, record.filename);
   }
 
   clearQueue(): Promise<void> {

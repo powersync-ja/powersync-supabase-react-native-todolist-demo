@@ -1,10 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import {
-  AbstractStorageAdapter,
-  BaseStorageAdapterOptions,
-  StorageOptions,
-  UploadOptions,
-} from '../storage/AbstractStorageAdapter';
+import { AbstractStorageAdapter, BaseStorageAdapterOptions, UploadOptions } from '../storage/AbstractStorageAdapter';
 
 export interface SupabaseStorageAdapterOptions extends BaseStorageAdapterOptions {
   client: SupabaseClient;
@@ -18,10 +13,8 @@ export class SupabaseStorageAdapter extends AbstractStorageAdapter<SupabaseStora
   }
 
   async uploadFile(filename: string, data: ArrayBuffer, options: UploadOptions): Promise<void> {
-    const bucket = options.bucket ?? SupabaseStorageAdapter.BUCKET_NAME;
-
     const res = await this.options.client.storage
-      .from(bucket)
+      .from(SupabaseStorageAdapter.BUCKET_NAME)
       .upload(filename, data, { contentType: options.mediaType });
 
     if (res.error) {
@@ -29,15 +22,27 @@ export class SupabaseStorageAdapter extends AbstractStorageAdapter<SupabaseStora
     }
   }
 
-  async downloadFile(filePath: string, options?: StorageOptions) {
-    const bucket = options?.bucket ?? SupabaseStorageAdapter.BUCKET_NAME;
-
-    const { data, error } = await this.options.client.storage.from(bucket).download(filePath);
+  async downloadFile(filePath: string) {
+    const { data, error } = await this.options.client.storage
+      .from(SupabaseStorageAdapter.BUCKET_NAME)
+      .download(filePath);
 
     if (error) {
       throw error;
     }
 
     return data as Blob;
+  }
+
+  async deleteFile(uri: string, filename: string): Promise<void> {
+    await super.deleteFile(uri, filename);
+
+    const { data, error } = await this.options.client.storage
+      .from(SupabaseStorageAdapter.BUCKET_NAME)
+      .remove([filename]);
+
+    if (error) {
+      console.debug('Failed to delete file from storage', error);
+    }
   }
 }

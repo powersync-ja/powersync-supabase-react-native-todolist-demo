@@ -10,8 +10,18 @@ export const HeaderWidget: React.FC<{
   title?: string;
 }> = (props) => {
   const { title } = props;
+  const [, forceUpdate] = React.useState<object>();
   const powersync = usePowerSync();
   const navigation = useNavigation();
+
+  React.useEffect(() => {
+    return powersync.registerListener({
+      statusChanged: () => {
+        forceUpdate({});
+      }
+    });
+  }, [powersync]);
+
   return (
     <Header
       leftComponent={

@@ -66,10 +66,12 @@ export const TodoItemWidget: React.FC<TodoItemWidgetProps> = (props) => {
         <ListItem.Content style={{ minHeight: 80 }}>
           <ListItem.Title>{record.description}</ListItem.Title>
         </ListItem.Content>
-        {record.photo_id == null || imageUri == null ? (
+        {record.photo_id == null ? (
           <Icon name={'camera'} type="font-awesome" onPress={() => setCameraVisible(true)} />
-        ) : (
+        ) : imageUri != null ? (
           <Image source={{ uri: imageUri }} containerStyle={styles.item} PlaceholderContent={<ActivityIndicator />} />
+        ) : (
+          <ActivityIndicator />
         )}
       </ListItem.Swipeable>
     </View>

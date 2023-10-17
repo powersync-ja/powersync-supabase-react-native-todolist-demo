@@ -24,13 +24,20 @@ export const SmartTodoItemWidget: React.FC<SmartTodoItemWidgetProps> = (props) =
   ]);
 
   React.useEffect(() => {
-    if (record.photo_id != null && photoRecord == null) {
-      const entry = newPhotoRecord(record.photo_id);
-      system.storage.fileExists(entry.local_uri!).then((exists) => {
-        entry.state = exists ? AttachmentState.QUEUED_UPLOAD : AttachmentState.QUEUED_DOWNLOAD;
-        system.attachmentQueue.saveToQueue(entry);
-      });
-    }
+    (async () => {
+      if (record.photo_id == null) {
+        return;
+      }
+      if (photoRecord == null) {
+        const newRecord = newPhotoRecord(record.photo_id);
+        await system.attachmentQueue.saveToQueue(newRecord);
+      } else {
+        const fileExist = await system.storage.fileExists(photoRecord.local_uri);
+        if (!fileExist) {
+          await system.attachmentQueue.saveToQueue({ ...photoRecord, state: AttachmentState.QUEUED_DOWNLOAD });
+        }
+      }
+    })();
   }, [record.photo_id, photoRecord]);
 
   const toggleCompletion = async (completed: boolean) => {
@@ -55,8 +62,8 @@ export const SmartTodoItemWidget: React.FC<SmartTodoItemWidgetProps> = (props) =
 
   const deleteTodo = async () => {
     await powerSync.writeTransaction(async (tx) => {
-      if (record.photo_id) {
-        await system.attachmentQueue.delete(record.photo_id, tx);
+      if (photoRecord != null) {
+        await system.attachmentQueue.delete(photoRecord, tx);
       }
       await tx.executeAsync(`DELETE FROM ${TODO_TABLE} WHERE id = ?`, [record.id]);
     });

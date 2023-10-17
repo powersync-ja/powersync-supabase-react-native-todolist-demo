@@ -29,6 +29,7 @@
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="powersync"/>
         <data android:scheme="com.anonymous.powersyncexample"/>
+        <data android:scheme="exp+powersync-example"/>
       </intent-filter>
     </activity>
     <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" android:exported="false"/>
