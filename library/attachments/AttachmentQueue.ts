@@ -1,13 +1,13 @@
-import * as FileSystem from 'expo-file-system';
 import { BaseListener, BaseObserver, Transaction } from '@journeyapps/powersync-sdk-react-native';
+import * as FileSystem from 'expo-file-system';
 import { EncodingType } from 'expo-file-system';
-import { UploadOptions } from '../storage/AbstractStorageAdapter';
+import { ATTACHMENT_TABLE, AttachmentRecord, AttachmentState } from '../powersync/AppSchema';
 import { System } from '../powersync/system';
-import { AttachmentEntry, AttachmentRecord } from './Attachment';
+import { UploadOptions } from '../storage/AbstractStorageAdapter';
 
-export const ATTACHMENT_QUEUE_TABLE = 'attachments';
 export const ATTACHMENT_LOCAL_STORAGE_KEY = 'attachments';
 export const ATTACHMENT_STORAGE_PATH = `${FileSystem.documentDirectory}${ATTACHMENT_LOCAL_STORAGE_KEY}`;
+const ATTACHMENT_QUEUE_INTERVAL = 60_000;
 
 export interface AttachmentQueueListener extends BaseListener {
   onUploadComplete: () => any;
@@ -26,35 +26,42 @@ export class AttachmentQueue extends BaseObserver<AttachmentQueueListener> {
 
   async init() {
     // await this.clearQueue();
-    // this.watchUploads();
-    // this.watchDownloads();
-    // this.trigger();
+    this.watchUploads();
+    this.watchDownloads();
+    this.trigger();
+
+    setInterval(() => this.trigger(), ATTACHMENT_QUEUE_INTERVAL);
   }
 
   get table() {
-    return ATTACHMENT_QUEUE_TABLE;
+    return ATTACHMENT_TABLE;
   }
 
   trigger() {
-    this.uploadLoop();
-    this.downloadLoop();
+    this.uploadRecords();
+    this.downloadRecords();
   }
 
-  async getEntry(id: string, tx: Transaction): Promise<AttachmentEntry | null> {
-    const { rows } = await tx.executeAsync(
-      `SELECT id, filename, local_uri, size, media_type FROM ${this.table} WHERE id = ?`,
-      [id]
+  async saveToQueue(record: Omit<AttachmentRecord, 'timestamp'>): Promise<AttachmentRecord> {
+    const updatedRecord: AttachmentRecord = {
+      ...record,
+      timestamp: new Date().getTime()
+    };
+
+    await this.system.powersync.execute(
+      `INSERT OR REPLACE INTO ${this.table} (id, timestamp, filename, local_uri, media_type, size, state) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [
+        updatedRecord.id,
+        updatedRecord.timestamp,
+        updatedRecord.filename,
+        updatedRecord.local_uri,
+        updatedRecord.media_type || null,
+        updatedRecord.size || null,
+        updatedRecord.state
+      ]
     );
-    const row = rows?.item(0);
-    return !!row
-      ? {
-          id: row.id,
-          filename: row.filename,
-          local_uri: row.local_uri,
-          size: row.size,
-          media_type: row.media_type
-        }
-      : null;
+
+    return updatedRecord;
   }
 
   async update(record: Omit<AttachmentRecord, 'timestamp'>): Promise<void> {
@@ -67,20 +74,14 @@ export class AttachmentQueue extends BaseObserver<AttachmentQueueListener> {
                 local_uri = ?,
                 size = ?,
                 media_type = ?,
-                queued = ?,
-                synced = ?
+                state = ?
              WHERE id = ?`,
-      [
-        timestamp,
-        record.filename,
-        record.local_uri,
-        record.size,
-        record.media_type,
-        record.queued,
-        record.synced,
-        record.id
-      ]
+      [timestamp, record.filename, record.local_uri, record.size, record.media_type, record.state, record.id]
     );
+  }
+
+  async getAttachment(id: string): Promise<AttachmentRecord | null> {
+    return this.system.powersync.getOptional<AttachmentRecord>(`SELECT * FROM ${this.table} WHERE id = ?`, [id]);
   }
 
   async delete(id: string, tx: Transaction): Promise<void> {
@@ -90,6 +91,8 @@ export class AttachmentQueue extends BaseObserver<AttachmentQueueListener> {
              WHERE id = ?`,
       [id]
     );
+
+    // TODO: delete file on storage
   }
 
   clearQueue(): Promise<void> {
@@ -101,120 +104,61 @@ export class AttachmentQueue extends BaseObserver<AttachmentQueueListener> {
     });
   }
 
-  async saveToQueue(
-    entry: AttachmentEntry,
-    options: {
-      queue?: boolean;
-      sync?: boolean;
-    } = {}
-  ): Promise<AttachmentEntry> {
-    const record: AttachmentRecord = {
-      ...entry,
-      timestamp: new Date().getTime(),
-      queued: options.queue === false ? 0 : 1,
-      synced: options.sync ? 1 : 0
-    };
-
-    await this.system.powersync.execute(
-      `INSERT OR REPLACE INTO ${this.table} (id, timestamp, filename, local_uri, media_type, size, queued, synced) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        record.id,
-        record.timestamp,
-        record.filename,
-        record.local_uri,
-        record.media_type || null,
-        record.size || null,
-        record.queued,
-        record.synced
-      ]
-    );
-
-    return record;
-  }
-
-  async getNextUploadEntry(): Promise<AttachmentEntry | null> {
-    try {
-      const row = await this.system.powersync.get<AttachmentRecord>(
-        `SELECT id, filename, local_uri, size, media_type
-                        FROM ${this.table} 
-                        WHERE synced = 0 and queued = 1 ORDER BY timestamp ASC`
-      );
-      return row
-        ? {
-            id: row.id,
-            filename: row.filename,
-            local_uri: row.local_uri,
-            size: row.size,
-            media_type: row.media_type
-          }
-        : null;
-    } catch (e) {
-      // ResultSet empty
-      return null;
-    }
-  }
-
-  async getNextDownloadEntries(): Promise<AttachmentEntry[]> {
-    const rows = await this.system.powersync.getAll<AttachmentRecord>(
+  async getNextUploadRecord(): Promise<AttachmentRecord | null> {
+    return this.system.powersync.getOptional<AttachmentRecord>(
       `SELECT id, filename, local_uri, size, media_type
-                        FROM ${this.table} 
-                        WHERE synced = 0 and queued = 0 ORDER BY timestamp ASC`
+                FROM ${this.table} 
+                WHERE state = ${AttachmentState.QUEUED_UPLOAD} OR state = ${AttachmentState.QUEUED_SYNC} 
+                ORDER BY timestamp ASC`
     );
-
-    return rows.map((row) => ({
-      id: row.id,
-      filename: row.filename,
-      local_uri: row.local_uri,
-      size: row.size,
-      media_type: row.media_type
-    }));
   }
 
-  async uploadNext(): Promise<boolean> {
-    const entry = await this.getNextUploadEntry();
-    if (!entry) {
-      return false;
-    }
-    return this.uploadEntry(entry);
+  async getNextDownloadRecords(): Promise<AttachmentRecord[]> {
+    return this.system.powersync.getAll<AttachmentRecord>(
+      `SELECT id, filename, local_uri, size, media_type
+                FROM ${this.table} 
+                WHERE state = ${AttachmentState.QUEUED_DOWNLOAD} OR state = ${AttachmentState.QUEUED_SYNC}
+                ORDER BY timestamp ASC`
+    );
   }
 
-  async uploadEntry(entry: AttachmentEntry) {
+  async uploadAttachment(record: AttachmentRecord) {
     try {
-      const fileBuffer = await this.system.storage.readFile(entry.local_uri, {
+      const fileBuffer = await this.system.storage.readFile(record.local_uri, {
         encoding: EncodingType.Base64,
-        mediaType: entry.media_type
+        mediaType: record.media_type
       });
 
       const options: UploadOptions = {};
-      if (entry.media_type) {
-        options.mediaType = entry.media_type;
+      if (record.media_type) {
+        options.mediaType = record.media_type;
       }
 
-      await this.system.storage.uploadFile(entry.filename, fileBuffer, options);
+      await this.system.storage.uploadFile(record.filename, fileBuffer, options);
       // Mark as uploaded
-      await this.update({ ...entry, queued: 0, synced: 1 });
+      await this.update({ ...record, state: AttachmentState.SYNCED });
 
       return true;
     } catch (e: any) {
       if (e.error == 'Duplicate') {
         console.log('File already uploaded, marking as synced');
-        await this.update({ ...entry, queued: 0, synced: 1 });
+        await this.update({ ...record, state: AttachmentState.SYNCED });
         return false;
       }
-      console.error(`uploadEntry::error for entry ${entry.filename}`, e);
+      console.error(`UploadAttachment error for record ${JSON.stringify(record, null, 2)}`, e);
       return false;
     }
   }
 
-  async downloadEntry(entry: AttachmentEntry) {
-    if (await this.system.storage.fileExists(entry.local_uri)) {
+  async downloadRecord(record: AttachmentRecord) {
+    if (await this.system.storage.fileExists(record.local_uri)) {
       console.log('File already downloaded, marking as synced');
-      await this.update({ ...entry, queued: 0, synced: 1 });
+      await this.update({ ...record, state: AttachmentState.SYNCED });
       return true;
     }
 
     try {
-      const fileBlob = await this.system.storage.downloadFile(entry.filename);
+      const fileBlob = await this.system.storage.downloadFile(record.filename);
 
       // Convert the blob data into a base64 string
       const base64Data = await new Promise<string>((resolve, reject) => {
@@ -227,13 +171,13 @@ export class AttachmentQueue extends BaseObserver<AttachmentQueueListener> {
         reader.readAsDataURL(fileBlob);
       });
 
-      await this.system.storage.makeDir(entry.local_uri.replace(entry.filename, ''));
-      await this.system.storage.writeFile(entry.local_uri, base64Data, { encoding: EncodingType.Base64 });
+      await this.system.storage.makeDir(record.local_uri.replace(record.filename, ''));
+      await this.system.storage.writeFile(record.local_uri, base64Data, { encoding: EncodingType.Base64 });
 
-      await this.update({ ...entry, queued: 0, synced: 1 });
+      await this.update({ ...record, state: AttachmentState.SYNCED });
       return true;
     } catch (e) {
-      console.error(`downloadEntry::error for entry ${entry}`, e);
+      console.error(`Download attachment error for record ${JSON.stringify(record, null, 2)}`, e);
     }
     return false;
   }
@@ -241,8 +185,9 @@ export class AttachmentQueue extends BaseObserver<AttachmentQueueListener> {
   async *idsToUpload(): AsyncIterable<string[]> {
     for await (const result of this.system.powersync.watch(
       `SELECT id
-                        FROM ${this.table} 
-                        WHERE synced = 0 and queued = 1`,
+              FROM ${this.table} 
+              WHERE 
+                  state = ${AttachmentState.QUEUED_UPLOAD} OR state = ${AttachmentState.QUEUED_SYNC}`,
       []
     )) {
       yield result.rows?._array.map((r) => r.id) || [];
@@ -252,8 +197,8 @@ export class AttachmentQueue extends BaseObserver<AttachmentQueueListener> {
   async watchUploads() {
     for await (const ids of this.idsToUpload()) {
       if (ids.length > 0) {
-        console.log('UploadEntries', ids.length);
-        await this.uploadLoop();
+        console.log('Records to upload = ', ids.length);
+        await this.uploadRecords();
       }
     }
   }
@@ -261,15 +206,20 @@ export class AttachmentQueue extends BaseObserver<AttachmentQueueListener> {
   /**
    * Returns immediately if another loop is in progress.
    */
-  private async uploadLoop() {
+  private async uploadRecords() {
     if (this.uploading) {
       return;
     }
     this.uploading = true;
     try {
       while (true) {
-        const uploaded = await this.uploadNext();
+        const record = await this.getNextUploadRecord();
+        if (!record) {
+          break;
+        }
+        const uploaded = await this.uploadAttachment(record);
         if (!uploaded) {
+          // TODO: we need to retry
           break;
         }
       }
@@ -284,8 +234,8 @@ export class AttachmentQueue extends BaseObserver<AttachmentQueueListener> {
   async *idsToDownload(): AsyncIterable<string[]> {
     for await (const result of this.system.powersync.watch(
       `SELECT id
-                        FROM ${this.table} 
-                        WHERE synced = 0 and queued = 0`,
+              FROM ${this.table} 
+              WHERE state = ${AttachmentState.QUEUED_DOWNLOAD} OR state = ${AttachmentState.QUEUED_SYNC}`,
       []
     )) {
       yield result.rows?._array.map((r) => r.id) || [];
@@ -295,32 +245,24 @@ export class AttachmentQueue extends BaseObserver<AttachmentQueueListener> {
   async watchDownloads() {
     for await (const ids of this.idsToDownload()) {
       if (ids.length > 0) {
-        await this.downloadLoop();
+        console.log('Records to download = ', ids.length);
+        await this.downloadRecords();
       }
     }
   }
 
-  private async downloadLoop() {
+  private async downloadRecords() {
     if (this.downloading) {
       return;
     }
-    if (this.uploading) {
-      console.log('Waiting for upload to complete');
-      await new Promise<void>((resolve) => {
-        const l = this.registerListener({
-          onUploadComplete: () => {
-            l();
-            resolve();
-          }
-        });
-      });
-    }
     try {
-      const entriesToDownload = await this.getNextDownloadEntries();
-      console.log('DownloadEntries', entriesToDownload.length);
-      for (const entry of entriesToDownload) {
-        const success = await this.downloadEntry(entry);
-        console.log('downloadEntry success', success, entry.local_uri);
+      const recordsToDownload = await this.getNextDownloadRecords();
+      if (recordsToDownload.length == 0) {
+        return;
+      }
+      for (const record of recordsToDownload) {
+        const success = await this.downloadRecord(record);
+        console.log('Download success = ', success);
       }
     } catch (e) {
       console.error('Downloads failed:', e);

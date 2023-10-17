@@ -2,6 +2,7 @@ import { Column, ColumnType, Index, IndexedColumn, Schema, Table } from '@journe
 
 export const TODO_TABLE = 'todos';
 export const LIST_TABLE = 'lists';
+export const ATTACHMENT_TABLE = 'attachments';
 
 export interface ListRecord {
   id: string;
@@ -22,6 +23,23 @@ export interface TodoRecord {
   list_id: string;
 
   photo_id?: string;
+}
+
+export enum AttachmentState {
+  QUEUED_SYNC = 0, // WIll check if the attachment needs to be uploaded or downloaded
+  QUEUED_UPLOAD = 1,
+  QUEUED_DOWNLOAD = 2,
+  SYNCED = 3
+}
+
+export interface AttachmentRecord {
+  id: string;
+  filename: string;
+  local_uri: string;
+  size?: number;
+  media_type?: string;
+  timestamp?: number;
+  state: AttachmentState;
 }
 
 export const AppSchema = new Schema([
@@ -62,8 +80,7 @@ export const AppSchema = new Schema([
       new Column({ name: 'timestamp', type: ColumnType.INTEGER }),
       new Column({ name: 'size', type: ColumnType.INTEGER }),
       new Column({ name: 'media_type', type: ColumnType.TEXT }),
-      new Column({ name: 'queued', type: ColumnType.INTEGER }),
-      new Column({ name: 'synced', type: ColumnType.INTEGER })
+      new Column({ name: 'state', type: ColumnType.INTEGER }) // Corresponds to AttachmentState
     ]
   })
 ]);

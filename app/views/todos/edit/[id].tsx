@@ -6,8 +6,8 @@ import { FAB } from 'react-native-elements';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import prompt from 'react-native-prompt-android';
 import { LIST_TABLE, ListRecord, TODO_TABLE, TodoRecord } from '../../../../library/powersync/AppSchema';
-import { SmartTodoItemsWidget } from '../../../../library/widgets/smart/SmartTodoItemsWidget';
 import { useSystem } from '../../../../library/powersync/system';
+import { SmartTodoItemWidget } from '../../../../library/widgets/smart/SmartTodoItemWidget';
 
 const TodoView: React.FC = () => {
   const system = useSystem();
@@ -19,8 +19,9 @@ const TodoView: React.FC = () => {
   }, [id]);
 
   const [listRecord] = usePowerSyncWatchedQuery<ListRecord>(`SELECT * FROM ${LIST_TABLE} WHERE id = ?`, idParam);
+  const todos = usePowerSyncWatchedQuery<TodoRecord>(`SELECT * from ${TODO_TABLE} WHERE list_id = ?`, idParam);
 
-  const createNewTodo = async (record: Pick<TodoRecord, 'description' | 'list_id'>) => {
+  const createNewTodo = async (description: string) => {
     const { userID } = await system.supabaseConnector.fetchCredentials();
 
     await powerSync.execute(
@@ -29,7 +30,7 @@ const TodoView: React.FC = () => {
                   (id, created_at, created_by, description, list_id) 
               VALUES
                   (uuid(), datetime(), ?, ?, ?)`,
-      [userID, record.description, record.list_id]
+      [userID, description, id!]
     );
   };
 
@@ -62,17 +63,16 @@ const TodoView: React.FC = () => {
                 return;
               }
 
-              return createNewTodo({
-                list_id: id!,
-                description: text
-              });
+              return createNewTodo(text);
             },
             { placeholder: 'Todo description', style: 'shimo' }
           );
         }}
       />
       <ScrollView key={`edit-view-${id}`} style={{ maxHeight: '90%' }}>
-        <SmartTodoItemsWidget id={listRecord.id} />
+        {todos.map((r) => {
+          return <SmartTodoItemWidget key={`todo-record-${r.id}`} record={r} />;
+        })}
       </ScrollView>
       <StatusBar style={'light'} />
     </View>
