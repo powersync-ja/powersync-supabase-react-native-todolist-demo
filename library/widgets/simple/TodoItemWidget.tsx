@@ -1,31 +1,31 @@
+import { CameraCapturedPicture } from 'expo-camera';
 import React from 'react';
 import { ActivityIndicator, Alert, View, Modal, StyleSheet } from 'react-native';
 import { ListItem, Button, Icon, Image } from 'react-native-elements';
-import { TodoModel } from '../models/TodoModel';
 import { CameraWidget } from './CameraWidget';
+import { TodoRecord } from '../../powersync/AppSchema';
 
 export interface TodoItemWidgetProps {
-  model: TodoModel;
+  record: TodoRecord;
+  imageUri?: string;
+  onSavePhoto: (data: CameraCapturedPicture) => Promise<void>;
+  onToggleCompletion: (completed: boolean) => Promise<void>;
+  onDelete?: () => Promise<void>;
 }
 
 export const TodoItemWidget: React.FC<TodoItemWidgetProps> = (props) => {
-  const { model } = props;
+  const { record, imageUri, onDelete, onToggleCompletion, onSavePhoto } = props;
   const [loading, setLoading] = React.useState(false);
   const [isCameraVisible, setCameraVisible] = React.useState(false);
 
-  const handleCancel = () => {
+  const handleCancel = React.useCallback(() => {
     setCameraVisible(false);
-  };
+  }, []);
 
   return (
-    <View key={`todo-item-${model.id}`} style={{ padding: 10 }}>
+    <View key={`todo-item-${record.id}`} style={{ padding: 10 }}>
       <Modal animationType="slide" transparent={false} visible={isCameraVisible} onRequestClose={handleCancel}>
-        <CameraWidget
-          onCaptured={(data) => {
-            model.savePhoto(data);
-          }}
-          onClose={handleCancel}
-        />
+        <CameraWidget onCaptured={onSavePhoto} onClose={handleCancel} />
       </Modal>
       <ListItem.Swipeable
         bottomDivider
@@ -34,7 +34,7 @@ export const TodoItemWidget: React.FC<TodoItemWidgetProps> = (props) => {
             containerStyle={{
               flex: 1,
               justifyContent: 'center',
-              backgroundColor: '#d3d3d3',
+              backgroundColor: '#d3d3d3'
             }}
             type="clear"
             icon={{ name: 'delete', color: 'red' }}
@@ -42,7 +42,7 @@ export const TodoItemWidget: React.FC<TodoItemWidgetProps> = (props) => {
               Alert.alert(
                 'Confirm',
                 'This item will be permanently deleted',
-                [{ text: 'Cancel' }, { text: 'Delete', onPress: () => model.delete() }],
+                [{ text: 'Cancel' }, { text: 'Delete', onPress: () => onDelete?.() }],
                 { cancelable: true }
               );
             }}
@@ -55,30 +55,21 @@ export const TodoItemWidget: React.FC<TodoItemWidgetProps> = (props) => {
             iconType="material-community"
             checkedIcon="checkbox-marked"
             uncheckedIcon="checkbox-blank-outline"
-            checked={model.record.completed}
+            checked={record.completed}
             onPress={async () => {
               setLoading(true);
-              try {
-                await model.toggleCompletion(!model.record.completed);
-              } catch (ex) {
-                console.error(ex);
-              } finally {
-                setLoading(false);
-              }
+              await onToggleCompletion(!record.completed);
+              setLoading(false);
             }}
           />
         )}
         <ListItem.Content style={{ minHeight: 80 }}>
-          <ListItem.Title>{model.record.description}</ListItem.Title>
+          <ListItem.Title>{record.description}</ListItem.Title>
         </ListItem.Content>
-        {model.record.photo_id == null ? (
+        {record.photo_id == null || imageUri == null ? (
           <Icon name={'camera'} type="font-awesome" onPress={() => setCameraVisible(true)} />
         ) : (
-          <Image
-            source={{ uri: model.getPhotoUri()! }}
-            containerStyle={styles.item}
-            PlaceholderContent={<ActivityIndicator />}
-          />
+          <Image source={{ uri: imageUri }} containerStyle={styles.item} PlaceholderContent={<ActivityIndicator />} />
         )}
       </ListItem.Swipeable>
     </View>
@@ -89,6 +80,6 @@ const styles = StyleSheet.create({
   item: {
     aspectRatio: 1,
     width: '100%',
-    flex: 1,
-  },
+    flex: 1
+  }
 });

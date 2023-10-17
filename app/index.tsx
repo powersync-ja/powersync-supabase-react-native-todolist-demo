@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { ActivityIndicator, View } from 'react-native';
-import { observer } from 'mobx-react-lite';
 
-import { useSystem } from '../library/stores/system';
+import { useSystem } from '../library/powersync/system';
 import { router } from 'expo-router';
 import Logger from 'js-logger';
 
@@ -12,7 +11,7 @@ import Logger from 'js-logger';
  *  - If one is present redirect to app views.
  *  - If not, reditect to login/register flow
  */
-const App = observer(() => {
+const App: React.FC = () => {
   const { supabaseConnector } = useSystem();
 
   React.useEffect(() => {
@@ -33,10 +32,10 @@ const App = observer(() => {
   }, []);
 
   return (
-    <View style={{ flex: 1, flexGrow: 1, alignContent: 'center', justifyContent: 'center' }}>
+    <View key={`loader`} style={{ flex: 1, flexGrow: 1, alignContent: 'center', justifyContent: 'center' }}>
       <ActivityIndicator />
     </View>
   );
-});
+};
 
 export default App;

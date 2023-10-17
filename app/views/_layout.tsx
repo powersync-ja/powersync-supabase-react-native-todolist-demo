@@ -1,6 +1,6 @@
 import React from 'react';
-import { useSystem } from '../../library/stores/system';
-import Drawer from '../../library/widgets/Drawer';
+import { useSystem } from '../../library/powersync/system';
+import Drawer from '../../library/widgets/simple/Drawer';
 
 /**
  * This layout uses a navigation Drawer for app views
@@ -18,20 +18,20 @@ const HomeLayout = () => {
         name="console"
         options={{
           drawerLabel: 'SQL Console',
-          title: 'SQL Console',
+          title: 'SQL Console'
         }}
       />
       <Drawer.Screen
         name="todos"
         options={{
           drawerLabel: 'Todo Lists',
-          title: 'Todo Lists',
+          title: 'Todo Lists'
         }}
       />
       <Drawer.Screen
         name="signout"
         options={{
-          drawerLabel: 'Sign Out',
+          drawerLabel: 'Sign Out'
         }}
       />
     </Drawer>

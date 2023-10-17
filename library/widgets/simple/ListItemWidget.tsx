@@ -1,30 +1,28 @@
 import React from 'react';
-import { ListModel } from '../models/ListModel';
 import { Alert, View } from 'react-native';
 import { ListItem, Icon, Button } from 'react-native-elements';
-import { router } from 'expo-router';
-import { observer } from 'mobx-react-lite';
 
-export const ListItemWidget: React.FC<{
-  model: ListModel;
-}> = observer((props) => {
-  const { model } = props;
+export interface ListItemWidgetProps {
+  title: string;
+  description?: string;
+  onPress?: () => void;
+  onDelete?: () => void;
+}
+
+export const ListItemWidget: React.FC<ListItemWidgetProps> = (props) => {
+  const { title, description, onDelete, onPress } = props;
+
   return (
     <View style={{ padding: 10 }}>
       <ListItem.Swipeable
         bottomDivider
-        onPress={() => {
-          router.push({
-            pathname: 'views/todos/edit/[id]',
-            params: { id: model.id },
-          });
-        }}
+        onPress={() => onPress?.()}
         rightContent={
           <Button
             containerStyle={{
               flex: 1,
               justifyContent: 'center',
-              backgroundColor: '#d3d3d3',
+              backgroundColor: '#d3d3d3'
             }}
             type="clear"
             icon={{ name: 'delete', color: 'red' }}
@@ -32,7 +30,7 @@ export const ListItemWidget: React.FC<{
               Alert.alert(
                 'Confirm',
                 'This list will be permanently deleted',
-                [{ text: 'Cancel' }, { text: 'Delete', onPress: () => model.delete() }],
+                [{ text: 'Cancel' }, { text: 'Delete', onPress: () => onDelete?.() }],
                 { cancelable: true }
               );
             }}
@@ -40,12 +38,12 @@ export const ListItemWidget: React.FC<{
         }>
         <Icon name="format-list-checks" type="material-community" color="grey" />
         <ListItem.Content style={{ minHeight: 80 }}>
-          <ListItem.Title>{model.record.name}</ListItem.Title>
-          <ListItem.Subtitle style={{ color: 'grey' }}>{model.description}</ListItem.Subtitle>
+          <ListItem.Title>{title}</ListItem.Title>
+          <ListItem.Subtitle style={{ color: 'grey' }}>{description}</ListItem.Subtitle>
         </ListItem.Content>
 
         <ListItem.Chevron />
       </ListItem.Swipeable>
     </View>
   );
-});
+};

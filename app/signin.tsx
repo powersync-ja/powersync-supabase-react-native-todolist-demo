@@ -2,9 +2,9 @@ import * as React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
-import { useSystem } from '../library/stores/system';
+import { useSystem } from '../library/powersync/system';
 import { Button } from 'react-native';
-import { TextInputWidget } from '../library/widgets/TextInputWidget';
+import { TextInputWidget } from '../library/widgets/simple/TextInputWidget';
 import { Icon } from 'react-native-elements';
 
 export default function Signin() {
@@ -69,9 +69,9 @@ export default function Signin() {
 
 export const SignInStyles = StyleSheet.create({
   input: {
-    fontSize: 14,
+    fontSize: 14
   },
   button_container: {
-    marginTop: 20,
-  },
+    marginTop: 20
+  }
 });

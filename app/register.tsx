@@ -3,8 +3,8 @@ import { StatusBar } from 'expo-status-bar';
 import { View, Text, ActivityIndicator, Button } from 'react-native';
 import { router } from 'expo-router';
 
-import { useSystem } from '../library/stores/system';
-import { TextInputWidget } from '../library/widgets/TextInputWidget';
+import { useSystem } from '../library/powersync/system';
+import { TextInputWidget } from '../library/widgets/simple/TextInputWidget';
 import { SignInStyles } from './signin';
 import { Icon } from 'react-native-elements';
 
@@ -42,7 +42,7 @@ export default function Register() {
                 try {
                   const { data, error } = await supabaseConnector.client.auth.signUp({
                     email: credentials.username,
-                    password: credentials.password,
+                    password: credentials.password
                   });
                   if (error) {
                     throw error;

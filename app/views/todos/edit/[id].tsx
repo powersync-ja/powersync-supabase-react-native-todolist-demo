@@ -1,29 +1,39 @@
+import { usePowerSync, usePowerSyncWatchedQuery } from '@journeyapps/powersync-sdk-react-native';
 import * as React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { ScrollView, View, Text } from 'react-native';
 import { FAB } from 'react-native-elements';
-import { observer } from 'mobx-react-lite';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import prompt from 'react-native-prompt-android';
+import { LIST_TABLE, ListRecord, TODO_TABLE, TodoRecord } from '../../../../library/powersync/AppSchema';
+import { SmartTodoItemsWidget } from '../../../../library/widgets/smart/SmartTodoItemsWidget';
+import { useSystem } from '../../../../library/powersync/system';
 
-import { useSystem } from '../../../../library/stores/system';
-import { TodoItemWidget } from '../../../../library/widgets/TodoItemWidget';
-
-const TodoView = observer(() => {
-  const { listStore, todoStore } = useSystem();
+const TodoView: React.FC = () => {
+  const system = useSystem();
+  const powerSync = usePowerSync();
   const params = useLocalSearchParams<{ id: string }>();
-
   const id = params.id;
-  const listModel = React.useMemo(() => {
-    if (!id) {
-      return null;
-    }
-    const listModel = listStore.getById(id);
-
-    return listModel;
+  const idParam = React.useMemo(() => {
+    return [id];
   }, [id]);
 
-  if (!listModel) {
+  const [listRecord] = usePowerSyncWatchedQuery<ListRecord>(`SELECT * FROM ${LIST_TABLE} WHERE id = ?`, idParam);
+
+  const createNewTodo = async (record: Pick<TodoRecord, 'description' | 'list_id'>) => {
+    const { userID } = await system.supabaseConnector.fetchCredentials();
+
+    await powerSync.execute(
+      `INSERT INTO
+              ${TODO_TABLE}
+                  (id, created_at, created_by, description, list_id) 
+              VALUES
+                  (uuid(), datetime(), ?, ?, ?)`,
+      [userID, record.description, record.list_id]
+    );
+  };
+
+  if (!listRecord) {
     return (
       <View>
         <Text>No matching List found</Text>
@@ -35,7 +45,7 @@ const TodoView = observer(() => {
     <View key={`$edit-${id}`} style={{ flexGrow: 1 }}>
       <Stack.Screen
         options={{
-          title: listModel.record.name,
+          title: listRecord.name
         }}
       />
       <FAB
@@ -52,10 +62,9 @@ const TodoView = observer(() => {
                 return;
               }
 
-              todoStore.createModel({
-                list_id: listModel.id,
-                description: text,
-                completed: false,
+              return createNewTodo({
+                list_id: id!,
+                description: text
               });
             },
             { placeholder: 'Todo description', style: 'shimo' }
@@ -63,14 +72,11 @@ const TodoView = observer(() => {
         }}
       />
       <ScrollView key={`edit-view-${id}`} style={{ maxHeight: '90%' }}>
-        {listModel.todos.map((t) => {
-          return <TodoItemWidget key={t.id} model={t} />;
-        })}
+        <SmartTodoItemsWidget id={listRecord.id} />
       </ScrollView>
-
       <StatusBar style={'light'} />
     </View>
   );
-});
+};
 
 export default TodoView;

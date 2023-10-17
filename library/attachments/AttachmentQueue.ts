@@ -2,7 +2,7 @@ import * as FileSystem from 'expo-file-system';
 import { BaseListener, BaseObserver, Transaction } from '@journeyapps/powersync-sdk-react-native';
 import { EncodingType } from 'expo-file-system';
 import { UploadOptions } from '../storage/AbstractStorageAdapter';
-import { System } from '../stores/system';
+import { System } from '../powersync/system';
 import { AttachmentEntry, AttachmentRecord } from './Attachment';
 
 export const ATTACHMENT_QUEUE_TABLE = 'attachments';
@@ -25,11 +25,10 @@ export class AttachmentQueue extends BaseObserver<AttachmentQueueListener> {
   }
 
   async init() {
-    await this.clearQueue();
-    this.watchUploads();
-    this.watchDownloads();
-
-    this.trigger();
+    // await this.clearQueue();
+    // this.watchUploads();
+    // this.watchDownloads();
+    // this.trigger();
   }
 
   get table() {

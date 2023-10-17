@@ -1,13 +1,14 @@
 import _ from 'lodash';
 import React from 'react';
-import { Table, Row } from 'react-native-table-component';
+// @ts-ignore
+import { Table, Row } from 'react-native-reanimated-table';
 import { QueryResult } from '@journeyapps/powersync-sdk-react-native';
-import { useSystem } from '../../library/stores/system';
+import { useSystem } from '../../library/powersync/system';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
 
 const DEFAULT_QUERY = 'SELECT * from lists';
 
-const App = () => {
+const App: React.FC = () => {
   const { powersync } = useSystem();
   const [output, setOutput] = React.useState<QueryResult | null>(null);
 

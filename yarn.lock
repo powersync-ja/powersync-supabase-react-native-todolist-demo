@@ -1608,17 +1608,17 @@
     "@types/yargs" "^17.0.8"
     chalk "^4.0.0"
 
-"@journeyapps/powersync-react@^0.0.1-alpha.0":
-  version "0.0.1-alpha.0"
-  resolved "https://registry.npmjs.org/@journeyapps/powersync-react/-/powersync-react-0.0.1-alpha.0.tgz#191c84057549749b133b134251d1e8530dca8a3c"
-  integrity sha512-19IvtLjxLa1mVlAC2tkbmDPTfmyeYrvBQCGMY4YRGhmfNkxbfxc07R/TG++hVBmTISUqftgo/OpNNF3cJhqdzw==
+"@journeyapps/powersync-react@0.0.0-dev.5abb174b":
+  version "0.0.0-dev.5abb174b"
+  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-react/-/powersync-react-0.0.0-dev.5abb174b.tgz#0a85f7b3c82e66dfa83a0d094060a84b2c6a495a"
+  integrity sha512-52zT0BzlbrPzDShve1oHZadnwBiQf5PHeObMvH201KGQDsP4HPhWn9fBdDZr7gx3NpOROE9UvC9yDtGd0awCxA==
   dependencies:
-    "@journeyapps/powersync-sdk-common" "^0.0.1-alpha.0"
+    "@journeyapps/powersync-sdk-common" "0.0.0-dev.5abb174b"
 
-"@journeyapps/powersync-sdk-common@^0.0.1-alpha.0":
-  version "0.0.1-alpha.0"
-  resolved "https://registry.npmjs.org/@journeyapps/powersync-sdk-common/-/powersync-sdk-common-0.0.1-alpha.0.tgz#de8e5456f88483307f3d28558e83c0ccba52238c"
-  integrity sha512-UJSoPiuUFVBwW8wY5AcenP4BplqRgtO3v4jbCT0NCh55i2DicXUJjc6Dq8u98XYdougYuLZpAOHhHZcjcYgLsg==
+"@journeyapps/powersync-sdk-common@0.0.0-dev.5abb174b":
+  version "0.0.0-dev.5abb174b"
+  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-sdk-common/-/powersync-sdk-common-0.0.0-dev.5abb174b.tgz#7be73a499c3dd4bbb16031abd4a23fd6b65eb28c"
+  integrity sha512-SWa74iLtqXuYQ6rxTqLc9rv/7AP4CpMOXAtdzG1XHWw39SxSJEe6XGiATBAF6AoO1KMAEUNMZ1ilRiMbYgcDUw==
   dependencies:
     async-mutex "^0.4.0"
     can-ndjson-stream "^1.0.2"
@@ -1628,26 +1628,13 @@
     object-hash "^3.0.0"
     uuid "^3.0.0"
 
-"@journeyapps/powersync-sdk-common@^0.0.1-alpha.1":
-  version "0.0.1-alpha.1"
-  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-sdk-common/-/powersync-sdk-common-0.0.1-alpha.1.tgz#d9223696dced77f9100e9628e2b1c5682204d634"
-  integrity sha512-vjJZOTryQBFpC9Rh4/19ONj6EO55TZN2KCpTcB8I+nYGozxxhaQa0NNc4+commAXjBs/fJ7aR44+AFFYPNwouw==
+"@journeyapps/powersync-sdk-react-native@0.0.0-dev.5abb174b":
+  version "0.0.0-dev.5abb174b"
+  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-sdk-react-native/-/powersync-sdk-react-native-0.0.0-dev.5abb174b.tgz#3c958cda1f3ddb8fcc217913c9c2a4b3aa66d2c9"
+  integrity sha512-z4HNdUHBvfP/IcCUaSGpGZvkPMTOG0Itu4wyvEC8p5drNx99yrpSJ83eJM41gnM1LZcGNTcbyaWMotZ92XJUwg==
   dependencies:
-    async-mutex "^0.4.0"
-    can-ndjson-stream "^1.0.2"
-    event-iterator "^2.0.0"
-    js-logger "^1.6.1"
-    lodash "^4.17.21"
-    object-hash "^3.0.0"
-    uuid "^3.0.0"
-
-"@journeyapps/powersync-sdk-react-native@0.0.1-alpha.2":
-  version "0.0.1-alpha.2"
-  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-sdk-react-native/-/powersync-sdk-react-native-0.0.1-alpha.2.tgz#3bd250a920059364bb45c3af5b99a0ac661d3907"
-  integrity sha512-Mewt4Gpz6gvn8u0ddgHonfJV0mNz2hcVrI1l1k2ljF9AQO+qYj1PSnizq/30QR/gLD8ERqmslujvwrNUkmrOTg==
-  dependencies:
-    "@journeyapps/powersync-react" "^0.0.1-alpha.0"
-    "@journeyapps/powersync-sdk-common" "^0.0.1-alpha.1"
+    "@journeyapps/powersync-react" "0.0.0-dev.5abb174b"
+    "@journeyapps/powersync-sdk-common" "0.0.0-dev.5abb174b"
     async-lock "^1.4.0"
 
 "@journeyapps/react-native-quick-sqlite@0.0.1-alpha.0":
@@ -1956,7 +1943,7 @@
   resolved "https://registry.npmjs.org/@react-native/normalize-colors/-/normalize-colors-0.72.0.tgz#14294b7ed3c1d92176d2a00df48456e8d7d62212"
   integrity sha512-285lfdqSXaqKuBbbtP9qL2tDrfxdOFtIMvkKadtleRQkdOxx+uzGvFr82KHmc/sSiMtfXGp7JnFYWVh4sFl7Yw==
 
-"@react-native/virtualized-lists@^0.72.4", "@react-native/virtualized-lists@^0.72.8":
+"@react-native/virtualized-lists@^0.72.8":
   version "0.72.8"
   resolved "https://registry.npmjs.org/@react-native/virtualized-lists/-/virtualized-lists-0.72.8.tgz#a2c6a91ea0f1d40eb5a122fb063daedb92ed1dc3"
   integrity sha512-J3Q4Bkuo99k7mu+jPS9gSUSgq+lLRSI/+ahXNwV92XgJ/8UgOTxu2LPwhJnBk/sQKxq7E8WkZBnBiozukQMqrw==
@@ -2183,15 +2170,6 @@
   resolved "https://registry.npmjs.org/@types/qs/-/qs-6.9.8.tgz#f2a7de3c107b89b441e071d5472e6b726b4adf45"
   integrity sha512-u95svzDlTysU5xecFNTgfFG5RUWu1A9P0VzgpcIiGZA9iraHOdSzcxMxQ55DyeRaGCSxQi7LxXDI4rzq/MYfdg==
 
-"@types/react-native-table-component@^1.2.4":
-  version "1.2.5"
-  resolved "https://registry.npmjs.org/@types/react-native-table-component/-/react-native-table-component-1.2.5.tgz#cf0a2bf8b6d82a38e3938afe957869f3c4f8d929"
-  integrity sha512-k/eEueXRCMF1C+NugH+IFEuQWdCa6y0tjmleG52ADWfhtvvAzWvDYVwAKkV8I6ODBFQ9F3CFZpl+sQFv+p+YxA==
-  dependencies:
-    "@types/react" "*"
-    "@types/react-native" "*"
-    csstype "^3.0.3"
-
 "@types/react-native-vector-icons@^6.4.6":
   version "6.4.15"
   resolved "https://registry.npmjs.org/@types/react-native-vector-icons/-/react-native-vector-icons-6.4.15.tgz#93cad672b6e5d4de2f8d48d8ace695586effede1"
@@ -2199,14 +2177,6 @@
   dependencies:
     "@types/react" "*"
     "@types/react-native" "^0.70"
-
-"@types/react-native@*":
-  version "0.72.3"
-  resolved "https://registry.npmjs.org/@types/react-native/-/react-native-0.72.3.tgz#eb5726eb3ec6b79a10db7a295cc0346eb5e9331a"
-  integrity sha512-9+g+DBJIY3bG7+ZlYzKPr9kxTQxUuZQgLWZhYK4RlIcrsm3qaJhL2PU2e/K4CjnzznWCo2Islgec94x2z1pG4Q==
-  dependencies:
-    "@react-native/virtualized-lists" "^0.72.4"
-    "@types/react" "*"
 
 "@types/react-native@^0.70":
   version "0.70.15"
@@ -3198,7 +3168,7 @@ crypto-random-string@^2.0.0:
   resolved "https://registry.npmjs.org/crypto-random-string/-/crypto-random-string-2.0.0.tgz#ef2a7a966ec11083388369baa02ebead229b30d5"
   integrity sha512-v1plID3y9r/lPhviJ1wrXpLeyUIGAZ2SHNYTEapm7/8A9nLPoyvVp3RK/EPFqn5kEznyWgYZNsRtYYIWbuG8KA==
 
-csstype@^3.0.2, csstype@^3.0.3:
+csstype@^3.0.2:
   version "3.1.2"
   resolved "https://registry.npmjs.org/csstype/-/csstype-3.1.2.tgz#1d4bf9d572f11c14031f0436e1c10bc1f571f50b"
   integrity sha512-I7K1Uu0MBPzaFKg4nI5Q7Vs2t+3gWWW648spaF+Rg7pI9ds18Ugn+lvg4SHczUdKlHI5LWBXyqfS8+DufyBsgQ==
@@ -5226,18 +5196,6 @@ mkdirp@^1.0.3, mkdirp@^1.0.4:
   resolved "https://registry.npmjs.org/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
 
-mobx-react-lite@^4.0.4:
-  version "4.0.5"
-  resolved "https://registry.npmjs.org/mobx-react-lite/-/mobx-react-lite-4.0.5.tgz#e2cb98f813e118917bcc463638f5bf6ea053a67b"
-  integrity sha512-StfB2wxE8imKj1f6T8WWPf4lVMx3cYH9Iy60bbKXEs21+HQ4tvvfIBZfSmMXgQAefi8xYEwQIz4GN9s0d2h7dg==
-  dependencies:
-    use-sync-external-store "^1.2.0"
-
-mobx@^6.10.2:
-  version "6.10.2"
-  resolved "https://registry.npmjs.org/mobx/-/mobx-6.10.2.tgz#96e123deef140750360ca9a5b02a8b91fbffd4d9"
-  integrity sha512-B1UGC3ieK3boCjnMEcZSwxqRDMdzX65H/8zOHbuTY8ZhvrIjTUoLRR2TP2bPqIgYRfb3+dUigu8yMZufNjn0LQ==
-
 ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
@@ -5971,6 +5929,11 @@ react-native-ratings@8.0.4:
   dependencies:
     lodash "^4.17.15"
 
+react-native-reanimated-table@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/react-native-reanimated-table/-/react-native-reanimated-table-0.0.2.tgz#015392dbc12fb03fd872d5a7eea9bc84c4f3a685"
+  integrity sha512-OeuqfU1AFEmHNTJlEOLWrV78JgAXnM0/ZrCm0Ab+9e5nwYJ+xab/UFXkNKz3Gyf08ZfLSNzwMQRjt3eZWPWoGA==
+
 react-native-reanimated@~3.3.0:
   version "3.3.0"
   resolved "https://registry.npmjs.org/react-native-reanimated/-/react-native-reanimated-3.3.0.tgz#80f9d58e28fddf62fe4c1bc792337b8ab57936ab"
@@ -6005,11 +5968,6 @@ react-native-size-matters@^0.3.1:
   version "0.3.1"
   resolved "https://registry.npmjs.org/react-native-size-matters/-/react-native-size-matters-0.3.1.tgz#24d0cfc335a2c730f6d58bd7b43ea5a41be4b49f"
   integrity sha512-mKOfBLIBFBcs9br1rlZDvxD5+mAl8Gfr5CounwJtxI6Z82rGrMO+Kgl9EIg3RMVf3G855a85YVqHJL2f5EDRlw==
-
-react-native-table-component@^1.2.2:
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/react-native-table-component/-/react-native-table-component-1.2.2.tgz#1c9bdcd8f1fd7edf10d1e93ebc3b7877ecd74def"
-  integrity sha512-7bbsi5431iWcjj3toASh8lFHGi6AG/+MTd4M7GuksXKxx/CFs/Qwv1Ys7D2wgyuYKe3hxWNfSVrteFj0tOYXYw==
 
 react-native-url-polyfill@^2.0.0:
   version "2.0.0"
@@ -7082,7 +7040,7 @@ use-latest-callback@^0.1.5:
   resolved "https://registry.npmjs.org/use-latest-callback/-/use-latest-callback-0.1.6.tgz#3fa6e7babbb5f9bfa24b5094b22939e1e92ebcf6"
   integrity sha512-VO/P91A/PmKH9bcN9a7O3duSuxe6M14ZoYXgA6a8dab8doWNdhiIHzEkX/jFeTTRBsX0Ubk6nG4q2NIjNsj+bg==
 
-use-sync-external-store@^1.0.0, use-sync-external-store@^1.2.0:
+use-sync-external-store@^1.0.0:
   version "1.2.0"
   resolved "https://registry.npmjs.org/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz#7dbefd6ef3fe4e767a0cf5d7287aacfb5846928a"
   integrity sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==
