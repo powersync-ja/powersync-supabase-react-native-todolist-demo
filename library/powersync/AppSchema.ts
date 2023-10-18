@@ -35,7 +35,7 @@ export enum AttachmentState {
 export interface AttachmentRecord {
   id: string;
   filename: string;
-  local_uri: string;
+  local_uri?: string;
   size?: number;
   media_type?: string;
   timestamp?: number;

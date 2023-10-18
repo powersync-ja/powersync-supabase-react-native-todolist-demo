@@ -10,14 +10,14 @@ export const HeaderWidget: React.FC<{
   title?: string;
 }> = (props) => {
   const { title } = props;
-  const [, forceUpdate] = React.useState<object>();
   const powersync = usePowerSync();
   const navigation = useNavigation();
+  const [connected, setConnected] = React.useState(powersync.connected);
 
   React.useEffect(() => {
     return powersync.registerListener({
-      statusChanged: () => {
-        forceUpdate({});
+      statusChanged: (status) => {
+        setConnected(status.connected);
       }
     });
   }, [powersync]);
@@ -37,7 +37,7 @@ export const HeaderWidget: React.FC<{
       }
       rightComponent={
         <Icon
-          name={powersync.connected ? 'wifi' : 'wifi-off'}
+          name={connected ? 'wifi' : 'wifi-off'}
           type="material-community"
           color="black"
           size={20}
@@ -45,7 +45,7 @@ export const HeaderWidget: React.FC<{
           onPress={() => {
             Alert.alert(
               'Status',
-              `${powersync.connected ? 'Connected' : 'Disconnected'}. \nLast Synced at ${
+              `${connected ? 'Connected' : 'Disconnected'}. \nLast Synced at ${
                 powersync.currentStatus?.lastSyncedAt.toISOString() ?? '-'
               }\nVersion: ${powersync.sdkVersion}`
             );

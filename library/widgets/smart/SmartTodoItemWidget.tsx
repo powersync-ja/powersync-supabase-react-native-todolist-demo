@@ -1,14 +1,9 @@
 import { usePowerSync, usePowerSyncWatchedQuery } from '@journeyapps/powersync-sdk-react-native';
 import { CameraCapturedPicture } from 'expo-camera';
-import * as FileSystem from 'expo-file-system';
 import * as React from 'react';
-import { v4 as uuid } from 'uuid';
 import { ATTACHMENT_TABLE, AttachmentRecord, AttachmentState, TODO_TABLE, TodoRecord } from '../../powersync/AppSchema';
 import { useSystem } from '../../powersync/system';
 import { TodoItemWidget } from '../simple/TodoItemWidget';
-
-export const TODO_LOCAL_STORAGE_KEY = 'todo_photos';
-export const TODO_LOCAL_STORAGE_PATH = `${FileSystem.documentDirectory}${TODO_LOCAL_STORAGE_KEY}`;
 
 export interface SmartTodoItemWidgetProps {
   record: TodoRecord;
@@ -19,26 +14,31 @@ export const SmartTodoItemWidget: React.FC<SmartTodoItemWidgetProps> = (props) =
   const powerSync = usePowerSync();
   const { record } = props;
 
-  const [photoRecord] = usePowerSyncWatchedQuery<AttachmentRecord>(`SELECT * FROM ${ATTACHMENT_TABLE} WHERE id = ?`, [
-    record.photo_id || 'NO_ATTACHMENT'
-  ]);
-
   React.useEffect(() => {
     (async () => {
       if (record.photo_id == null) {
         return;
       }
-      if (photoRecord == null) {
-        const newRecord = newPhotoRecord(record.photo_id);
+      // We need to query the attachment table, as the usePowerSyncWatchedQuery might not have updated yet
+      const photoRecordAsync = await system.attachmentQueue.getAttachmentRecord(record.photo_id);
+      if (photoRecordAsync == null) {
+        const newRecord = system.attachmentQueue.newPhotoRecord({
+          id: record.photo_id,
+          state: AttachmentState.QUEUED_SYNC
+        });
         await system.attachmentQueue.saveToQueue(newRecord);
       } else {
-        const fileExist = await system.storage.fileExists(photoRecord.local_uri);
-        if (!fileExist) {
-          await system.attachmentQueue.saveToQueue({ ...photoRecord, state: AttachmentState.QUEUED_DOWNLOAD });
+        // If the photo is not in local storage, queue it for download
+        if (photoRecordAsync.local_uri == null || !(await system.storage.fileExists(photoRecordAsync.local_uri))) {
+          await system.attachmentQueue.saveToQueue({ ...photoRecordAsync, state: AttachmentState.QUEUED_DOWNLOAD });
         }
       }
     })();
-  }, [record.photo_id, photoRecord]);
+  }, [record.photo_id]);
+
+  const [photoRecord] = usePowerSyncWatchedQuery<AttachmentRecord>(`SELECT * FROM ${ATTACHMENT_TABLE} WHERE id = ?`, [
+    record.photo_id || 'NO_ATTACHMENT'
+  ]);
 
   const toggleCompletion = async (completed: boolean) => {
     const updatedRecord = { ...record, completed: completed };
@@ -70,20 +70,8 @@ export const SmartTodoItemWidget: React.FC<SmartTodoItemWidgetProps> = (props) =
   };
 
   const savePhoto = async (data: CameraCapturedPicture) => {
-    const photoId = uuid();
-    const entry = newPhotoRecord(photoId);
-
-    const { local_uri, filename } = entry;
-    await system.storage.makeDir(local_uri.replace(filename, ''));
-    //Copy photo from temp to local storage
-    await system.storage.copyFile(data.uri, entry.local_uri!);
-
-    const fileInfo = await FileSystem.getInfoAsync(entry.local_uri!);
-    if (fileInfo.exists) {
-      entry.size = fileInfo.size;
-    }
-    //Enqueue attachment
-    await system.attachmentQueue.saveToQueue(entry);
+    // We are sure the base64 is not null, as we are using the base64 option in the CameraWidget
+    const { id: photoId } = await system.attachmentQueue.savePhoto(data.base64!);
 
     await powerSync.execute(`UPDATE ${TODO_TABLE} SET photo_id = ? WHERE id = ?`, [photoId, record.id]);
   };
@@ -98,22 +86,3 @@ export const SmartTodoItemWidget: React.FC<SmartTodoItemWidgetProps> = (props) =
     />
   );
 };
-
-export function buildPhotoUri(filename: string) {
-  return `${TODO_LOCAL_STORAGE_PATH}/${filename}`;
-}
-
-export function newPhotoRecord(
-  photoId: string,
-  state: AttachmentState = AttachmentState.QUEUED_SYNC
-): AttachmentRecord {
-  const filename = `${photoId}.jpg`;
-
-  return {
-    id: photoId,
-    filename,
-    local_uri: buildPhotoUri(filename),
-    media_type: 'image/jpeg',
-    state
-  };
-}

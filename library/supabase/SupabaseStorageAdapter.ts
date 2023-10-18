@@ -34,8 +34,8 @@ export class SupabaseStorageAdapter extends AbstractStorageAdapter<SupabaseStora
     return data as Blob;
   }
 
-  async deleteFile(uri: string, filename: string): Promise<void> {
-    await super.deleteFile(uri, filename);
+  async deleteFile(filename: string, uri?: string): Promise<void> {
+    await super.deleteFile(filename, uri);
 
     const { data, error } = await this.options.client.storage
       .from(SupabaseStorageAdapter.BUCKET_NAME)
@@ -44,5 +44,7 @@ export class SupabaseStorageAdapter extends AbstractStorageAdapter<SupabaseStora
     if (error) {
       console.debug('Failed to delete file from storage', error);
     }
+
+    console.debug('Deleted file from storage', data);
   }
 }

@@ -55,7 +55,10 @@ export abstract class AbstractStorageAdapter<T extends BaseStorageAdapterOptions
     await FileSystem.copyAsync({ from: sourceUri, to: targetUri });
   }
 
-  async deleteFile(uri: string, filename: string): Promise<void> {
+  async deleteFile(filename: string, uri?: string): Promise<void> {
+    if (!uri) {
+      return;
+    }
     if (await this.fileExists(uri)) {
       await FileSystem.deleteAsync(uri);
     }

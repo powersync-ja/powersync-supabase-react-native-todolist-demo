@@ -19,7 +19,7 @@ import { PowerSyncContext } from '@journeyapps/powersync-sdk-react-native';
  */
 const HomeLayout = () => {
   const system = useSystem();
-  const db = React.useMemo(() => {
+  const db = useMemo(() => {
     return system.powersync;
   }, []);
   return (
