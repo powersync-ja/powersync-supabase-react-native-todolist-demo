@@ -191,7 +191,7 @@ export class AttachmentQueue {
       return true;
     } catch (e: any) {
       if (e.error == 'Duplicate') {
-        console.log('File already uploaded, marking as synced');
+        console.log(`File already uploaded, marking ${record.id} as synced`);
         await this.update({ ...record, state: AttachmentState.SYNCED });
         return false;
       }
@@ -257,7 +257,6 @@ export class AttachmentQueue {
   async watchUploads() {
     for await (const ids of this.idsToUpload()) {
       if (ids.length > 0) {
-        console.log('Records to upload = ', ids.length);
         await this.uploadRecords();
       }
     }
@@ -271,8 +270,8 @@ export class AttachmentQueue {
       return;
     }
     this.uploading = true;
-    console.debug('Uploading attachments...');
     try {
+      console.debug(`Uploading attachments...`);
       while (true) {
         const record = await this.getNextUploadRecord();
         if (!record) {
@@ -288,6 +287,7 @@ export class AttachmentQueue {
       console.error('Upload failed:', error);
     } finally {
       this.uploading = false;
+      console.debug('Finished uploading attachments');
     }
   }
 
@@ -308,7 +308,6 @@ export class AttachmentQueue {
   async watchDownloads() {
     for await (const ids of this.idsToDownload()) {
       if (ids.length > 0) {
-        console.log('Records to download = ', ids.length);
         await this.downloadRecords();
       }
     }
@@ -319,12 +318,12 @@ export class AttachmentQueue {
       return;
     }
     this.downloading = true;
-    console.debug('Downloading attachments...');
     try {
       const recordsToDownload = await this.getNextDownloadRecords();
       if (recordsToDownload.length == 0) {
         return;
       }
+      console.debug(`Downloading ${recordsToDownload.length} attachments...`);
       for (const record of recordsToDownload) {
         await this.downloadRecord(record);
       }
@@ -332,6 +331,7 @@ export class AttachmentQueue {
       console.error('Downloads failed:', e);
     } finally {
       this.downloading = false;
+      console.debug('Finished downloading attachments');
     }
   }
 
