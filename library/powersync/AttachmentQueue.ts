@@ -6,7 +6,7 @@ import { AbstractStorageAdapter, UploadOptions } from '../storage/AbstractStorag
 
 export const ATTACHMENT_LOCAL_STORAGE_KEY = 'attachments';
 export const ATTACHMENT_STORAGE_PATH = `${FileSystem.documentDirectory}${ATTACHMENT_LOCAL_STORAGE_KEY}`;
-export const ATTACHMENT_QUEUE_INTERVAL = 60_000;
+export const ATTACHMENT_QUEUE_INTERVAL = 30_000;
 export const ATTACHMENT_CACHE_LIMIT = 100;
 
 export interface AttachmentQueueOptions {
@@ -21,6 +21,7 @@ export class AttachmentQueue {
   uploading: boolean;
   downloading: boolean;
   options: AttachmentQueueOptions;
+  downloadQueue: Set<string>;
 
   constructor(options: AttachmentQueueOptions) {
     this.uploading = false;
@@ -30,6 +31,7 @@ export class AttachmentQueue {
       syncInterval: options.syncInterval ?? ATTACHMENT_QUEUE_INTERVAL,
       cacheLimit: options.cacheLimit ?? ATTACHMENT_CACHE_LIMIT
     };
+    this.downloadQueue = new Set<string>();
   }
 
   protected get powersync() {
@@ -71,6 +73,7 @@ export class AttachmentQueue {
 
   async savePhoto(base64Data: string): Promise<AttachmentRecord> {
     const photoAttachment = this.newPhotoRecord();
+    photoAttachment.local_uri = this.getLocalUri(photoAttachment.filename);
     await this.storage.writeFile(photoAttachment.local_uri!, base64Data, { encoding: FileSystem.EncodingType.Base64 });
 
     const fileInfo = await FileSystem.getInfoAsync(photoAttachment.local_uri!);
@@ -163,23 +166,17 @@ export class AttachmentQueue {
     );
   }
 
-  async getNextDownloadRecords(): Promise<AttachmentRecord[]> {
-    return this.powersync.getAll<AttachmentRecord>(
-      `SELECT *
-                FROM ${this.table} 
-                WHERE
-                  state = ${AttachmentState.QUEUED_DOWNLOAD} 
-                OR
-                  state = ${AttachmentState.QUEUED_SYNC}
-                ORDER BY timestamp ASC`
-    );
-  }
-
   async uploadAttachment(record: AttachmentRecord) {
     if (!record.local_uri) {
       throw new Error(`No local_uri for record ${JSON.stringify(record, null, 2)}`);
     }
     try {
+      if (!(await this.storage.fileExists(record.local_uri))) {
+        console.warn(`File for ${record.id} does not exist, skipping upload`);
+        await this.update({ ...record, state: AttachmentState.QUEUED_DOWNLOAD });
+        return true;
+      }
+
       const fileBuffer = await this.storage.readFile(record.local_uri, {
         encoding: FileSystem.EncodingType.Base64,
         mediaType: record.media_type
@@ -197,7 +194,7 @@ export class AttachmentQueue {
       return true;
     } catch (e: any) {
       if (e.error == 'Duplicate') {
-        console.log(`File already uploaded, marking ${record.id} as synced`);
+        console.debug(`File already uploaded, marking ${record.id} as synced`);
         await this.update({ ...record, state: AttachmentState.SYNCED });
         return false;
       }
@@ -298,6 +295,19 @@ export class AttachmentQueue {
     }
   }
 
+  async getIdsToDownload(): Promise<string[]> {
+    const res = await this.powersync.getAll<{ id: string }>(
+      `SELECT id
+                FROM ${this.table} 
+                WHERE
+                  state = ${AttachmentState.QUEUED_DOWNLOAD} 
+                OR
+                  state = ${AttachmentState.QUEUED_SYNC}
+                ORDER BY timestamp ASC`
+    );
+    return res.map((r) => r.id);
+  }
+
   async *idsToDownload(): AsyncIterable<string[]> {
     for await (const result of this.powersync.watch(
       `SELECT id
@@ -314,9 +324,8 @@ export class AttachmentQueue {
 
   async watchDownloads() {
     for await (const ids of this.idsToDownload()) {
-      if (ids.length > 0) {
-        await this.downloadRecords();
-      }
+      ids.map((id) => this.downloadQueue.add(id));
+      this.downloadRecords();
     }
   }
 
@@ -326,18 +335,26 @@ export class AttachmentQueue {
     }
     this.downloading = true;
     try {
-      const recordsToDownload = await this.getNextDownloadRecords();
-      if (recordsToDownload.length == 0) {
+      if (this.downloadQueue.size == 0) {
+        this.downloading = false;
         return;
       }
-      console.debug(`Downloading ${recordsToDownload.length} attachments...`);
-      for (const record of recordsToDownload) {
+      console.debug(`Downloading ${this.downloadQueue.size} attachments...`);
+      while (this.downloadQueue.size > 0) {
+        const id = this.downloadQueue.values().next().value;
+        this.downloadQueue.delete(id);
+        const record = await this.getAttachmentRecord(id);
+        if (!record) {
+          this.downloadQueue.delete(id);
+          continue;
+        }
         await this.downloadRecord(record);
       }
       console.debug('Finished downloading attachments');
     } catch (e) {
       console.error('Downloads failed:', e);
     } finally {
+      (await this.getIdsToDownload()).map((id) => this.downloadQueue.add(id));
       this.downloading = false;
     }
   }
@@ -353,7 +370,6 @@ export class AttachmentQueue {
       id: photoId,
       filename,
       media_type: 'image/jpeg',
-      local_uri: this.getLocalUri(filename),
       state: AttachmentState.QUEUED_UPLOAD,
       ...record
     };

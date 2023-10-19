@@ -3,24 +3,29 @@ import React from 'react';
 import { ActivityIndicator, Alert, View, Modal, StyleSheet } from 'react-native';
 import { ListItem, Button, Icon, Image } from 'react-native-elements';
 import { CameraWidget } from './CameraWidget';
-import { TodoRecord } from '../../powersync/AppSchema';
+import { AttachmentRecord, TodoRecord } from '../../powersync/AppSchema';
 
 export interface TodoItemWidgetProps {
   record: TodoRecord;
-  imageUri?: string;
+  photoAttachment?: AttachmentRecord;
   onSavePhoto: (data: CameraCapturedPicture) => Promise<void>;
   onToggleCompletion: (completed: boolean) => Promise<void>;
   onDelete?: () => Promise<void>;
 }
 
 export const TodoItemWidget: React.FC<TodoItemWidgetProps> = (props) => {
-  const { record, imageUri, onDelete, onToggleCompletion, onSavePhoto } = props;
+  const { record, photoAttachment, onDelete, onToggleCompletion, onSavePhoto } = props;
   const [loading, setLoading] = React.useState(false);
   const [isCameraVisible, setCameraVisible] = React.useState(false);
+  const [, forceUpdate] = React.useState({});
 
   const handleCancel = React.useCallback(() => {
     setCameraVisible(false);
   }, []);
+
+  React.useEffect(() => {
+    forceUpdate({});
+  }, [photoAttachment?.state]);
 
   return (
     <View key={`todo-item-${record.id}`} style={{ padding: 10 }}>
@@ -68,8 +73,12 @@ export const TodoItemWidget: React.FC<TodoItemWidgetProps> = (props) => {
         </ListItem.Content>
         {record.photo_id == null ? (
           <Icon name={'camera'} type="font-awesome" onPress={() => setCameraVisible(true)} />
-        ) : imageUri != null ? (
-          <Image source={{ uri: imageUri }} containerStyle={styles.item} PlaceholderContent={<ActivityIndicator />} />
+        ) : photoAttachment?.local_uri != null ? (
+          <Image
+            source={{ uri: photoAttachment.local_uri }}
+            containerStyle={styles.item}
+            PlaceholderContent={<ActivityIndicator />}
+          />
         ) : (
           <ActivityIndicator />
         )}

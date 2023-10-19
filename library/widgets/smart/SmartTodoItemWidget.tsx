@@ -78,7 +78,7 @@ export const SmartTodoItemWidget: React.FC<SmartTodoItemWidgetProps> = (props) =
   return (
     <TodoItemWidget
       record={record}
-      imageUri={photoRecord?.local_uri}
+      photoAttachment={photoRecord}
       onToggleCompletion={toggleCompletion}
       onSavePhoto={savePhoto}
       onDelete={deleteTodo}
