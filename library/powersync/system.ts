@@ -7,7 +7,7 @@ import { AppSchema, TODO_TABLE } from './AppSchema';
 import { AbstractStorageAdapter } from '../storage/AbstractStorageAdapter';
 import { SupabaseConnector } from '../supabase/SupabaseConnector';
 import { KVStorage } from '../storage/KVStorage';
-import { AttachmentQueue } from '../attachments/AttachmentQueue';
+import { AttachmentQueue } from './AttachmentQueue';
 
 export class System {
   kvStorage: KVStorage;

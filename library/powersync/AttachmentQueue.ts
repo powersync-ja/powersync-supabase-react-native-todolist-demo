@@ -1,18 +1,20 @@
 import { AbstractPowerSyncDatabase, Transaction } from '@journeyapps/powersync-sdk-react-native';
 import * as FileSystem from 'expo-file-system';
 import { v4 as uuid } from 'uuid';
-import { ATTACHMENT_TABLE, AttachmentRecord, AttachmentState } from '../powersync/AppSchema';
+import { ATTACHMENT_TABLE, AttachmentRecord, AttachmentState } from './AppSchema';
 import { AbstractStorageAdapter, UploadOptions } from '../storage/AbstractStorageAdapter';
 
 export const ATTACHMENT_LOCAL_STORAGE_KEY = 'attachments';
 export const ATTACHMENT_STORAGE_PATH = `${FileSystem.documentDirectory}${ATTACHMENT_LOCAL_STORAGE_KEY}`;
-const ATTACHMENT_QUEUE_INTERVAL = 60_000;
+export const ATTACHMENT_QUEUE_INTERVAL = 60_000;
+export const ATTACHMENT_CACHE_LIMIT = 100;
 
 export interface AttachmentQueueOptions {
   powersync: AbstractPowerSyncDatabase;
   storage: AbstractStorageAdapter;
   getAttachmentIds?: () => Promise<string[]>;
   syncInterval?: number;
+  cacheLimit?: number;
 }
 
 export class AttachmentQueue {
@@ -23,7 +25,11 @@ export class AttachmentQueue {
   constructor(options: AttachmentQueueOptions) {
     this.uploading = false;
     this.downloading = false;
-    this.options = { ...options, syncInterval: options.syncInterval ?? ATTACHMENT_QUEUE_INTERVAL };
+    this.options = {
+      ...options,
+      syncInterval: options.syncInterval ?? ATTACHMENT_QUEUE_INTERVAL,
+      cacheLimit: options.cacheLimit ?? ATTACHMENT_CACHE_LIMIT
+    };
   }
 
   protected get powersync() {
@@ -50,13 +56,13 @@ export class AttachmentQueue {
     this.watchUploads();
     this.watchDownloads();
 
-    this.trigger();
     setInterval(() => this.trigger(), ATTACHMENT_QUEUE_INTERVAL);
   }
 
   trigger() {
     this.uploadRecords();
     this.downloadRecords();
+    this.expireCache();
   }
 
   async getAttachmentRecord(id: string): Promise<AttachmentRecord | null> {
@@ -271,23 +277,24 @@ export class AttachmentQueue {
     }
     this.uploading = true;
     try {
+      let record = await this.getNextUploadRecord();
+      if (!record) {
+        return;
+      }
       console.debug(`Uploading attachments...`);
-      while (true) {
-        const record = await this.getNextUploadRecord();
-        if (!record) {
-          break;
-        }
+      while (record) {
         const uploaded = await this.uploadAttachment(record);
         if (!uploaded) {
           // TODO: we need to retry
           break;
         }
+        record = await this.getNextUploadRecord();
       }
+      console.debug('Finished uploading attachments');
     } catch (error) {
       console.error('Upload failed:', error);
     } finally {
       this.uploading = false;
-      console.debug('Finished uploading attachments');
     }
   }
 
@@ -327,11 +334,11 @@ export class AttachmentQueue {
       for (const record of recordsToDownload) {
         await this.downloadRecord(record);
       }
+      console.debug('Finished downloading attachments');
     } catch (e) {
       console.error('Downloads failed:', e);
     } finally {
       this.downloading = false;
-      console.debug('Finished downloading attachments');
     }
   }
 
@@ -350,6 +357,26 @@ export class AttachmentQueue {
       state: AttachmentState.QUEUED_UPLOAD,
       ...record
     };
+  }
+
+  async expireCache() {
+    const res = await this.powersync.getAll<AttachmentRecord>(`SELECT * FROM ${this.table} 
+          WHERE 
+           state = ${AttachmentState.SYNCED}
+         ORDER BY 
+           timestamp DESC
+         LIMIT 100 OFFSET ${this.options.cacheLimit}`);
+
+    if (res.length == 0) {
+      return;
+    }
+
+    console.debug(`Deleting ${res.length} attachments from cache...`);
+    await this.powersync.writeTransaction(async (tx) => {
+      for (const record of res) {
+        await this.delete(record, tx);
+      }
+    });
   }
 
   clearQueue(): Promise<void> {

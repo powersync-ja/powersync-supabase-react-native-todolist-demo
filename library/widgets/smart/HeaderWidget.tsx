@@ -1,4 +1,4 @@
-import { usePowerSync } from '@journeyapps/powersync-sdk-react-native';
+import { AbstractPowerSyncDatabase, usePowerSync } from '@journeyapps/powersync-sdk-react-native';
 import React from 'react';
 import { Alert, Text } from 'react-native';
 import { Icon } from 'react-native-elements';
@@ -9,8 +9,7 @@ import { DrawerActions } from '@react-navigation/native';
 export const HeaderWidget: React.FC<{
   title?: string;
 }> = (props) => {
-  const { title } = props;
-  const powersync = usePowerSync();
+  const powersync: AbstractPowerSyncDatabase = usePowerSync();
   const navigation = useNavigation();
   const [connected, setConnected] = React.useState(powersync.connected);
 
@@ -22,6 +21,7 @@ export const HeaderWidget: React.FC<{
     });
   }, [powersync]);
 
+  const { title } = props;
   return (
     <Header
       leftComponent={

@@ -1,4 +1,4 @@
-import { usePowerSync, usePowerSyncWatchedQuery } from '@journeyapps/powersync-sdk-react-native';
+import { usePowerSyncWatchedQuery } from '@journeyapps/powersync-sdk-react-native';
 import { CameraCapturedPicture } from 'expo-camera';
 import * as React from 'react';
 import { ATTACHMENT_TABLE, AttachmentRecord, AttachmentState, TODO_TABLE, TodoRecord } from '../../powersync/AppSchema';
@@ -11,7 +11,6 @@ export interface SmartTodoItemWidgetProps {
 
 export const SmartTodoItemWidget: React.FC<SmartTodoItemWidgetProps> = (props) => {
   const system = useSystem();
-  const powerSync = usePowerSync();
   const { record } = props;
 
   React.useEffect(() => {
@@ -50,7 +49,7 @@ export const SmartTodoItemWidget: React.FC<SmartTodoItemWidgetProps> = (props) =
       updatedRecord.completed_at = undefined;
       updatedRecord.completed_by = undefined;
     }
-    await powerSync.execute(
+    await system.powersync.execute(
       `UPDATE ${TODO_TABLE}
             SET completed = ?,
                 completed_at = ?,
@@ -61,7 +60,7 @@ export const SmartTodoItemWidget: React.FC<SmartTodoItemWidgetProps> = (props) =
   };
 
   const deleteTodo = async () => {
-    await powerSync.writeTransaction(async (tx) => {
+    await system.powersync.writeTransaction(async (tx) => {
       if (photoRecord != null) {
         await system.attachmentQueue.delete(photoRecord, tx);
       }
@@ -73,7 +72,7 @@ export const SmartTodoItemWidget: React.FC<SmartTodoItemWidgetProps> = (props) =
     // We are sure the base64 is not null, as we are using the base64 option in the CameraWidget
     const { id: photoId } = await system.attachmentQueue.savePhoto(data.base64!);
 
-    await powerSync.execute(`UPDATE ${TODO_TABLE} SET photo_id = ? WHERE id = ?`, [photoId, record.id]);
+    await system.powersync.execute(`UPDATE ${TODO_TABLE} SET photo_id = ? WHERE id = ?`, [photoId, record.id]);
   };
 
   return (
