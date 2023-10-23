@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSystem } from '../../library/powersync/system';
-import Drawer from '../../library/widgets/simple/Drawer';
+import Drawer from '../../library/widgets/Drawer';
 
 /**
  * This layout uses a navigation Drawer for app views

@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { createDrawerNavigator, DrawerNavigationOptions } from '@react-navigation/drawer';
 
 import { withLayoutContext } from 'expo-router';
-import { HeaderWidget } from '../smart/HeaderWidget';
+import { HeaderWidget } from './HeaderWidget';
 
 const DrawerNavigator = createDrawerNavigator().Navigator as React.ComponentType<any>;
 

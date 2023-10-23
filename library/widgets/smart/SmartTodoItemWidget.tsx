@@ -3,7 +3,7 @@ import { CameraCapturedPicture } from 'expo-camera';
 import * as React from 'react';
 import { ATTACHMENT_TABLE, AttachmentRecord, AttachmentState, TODO_TABLE, TodoRecord } from '../../powersync/AppSchema';
 import { useSystem } from '../../powersync/system';
-import { TodoItemWidget } from '../simple/TodoItemWidget';
+import { TodoItemWidget } from '../TodoItemWidget';
 
 export interface SmartTodoItemWidgetProps {
   record: TodoRecord;
@@ -35,53 +35,5 @@ export const SmartTodoItemWidget: React.FC<SmartTodoItemWidgetProps> = (props) =
     })();
   }, [record.photo_id]);
 
-  const [photoRecord] = usePowerSyncWatchedQuery<AttachmentRecord>(`SELECT * FROM ${ATTACHMENT_TABLE} WHERE id = ?`, [
-    record.photo_id || 'NO_ATTACHMENT'
-  ]);
-
-  const toggleCompletion = async (completed: boolean) => {
-    const updatedRecord = { ...record, completed: completed };
-    if (completed) {
-      const { userID } = await system.supabaseConnector.fetchCredentials();
-      updatedRecord.completed_at = new Date().toISOString();
-      updatedRecord.completed_by = userID;
-    } else {
-      updatedRecord.completed_at = undefined;
-      updatedRecord.completed_by = undefined;
-    }
-    await system.powersync.execute(
-      `UPDATE ${TODO_TABLE}
-            SET completed = ?,
-                completed_at = ?,
-                completed_by = ?
-            WHERE id = ?`,
-      [completed, updatedRecord.completed_at, updatedRecord.completed_by, record.id]
-    );
-  };
-
-  const deleteTodo = async () => {
-    await system.powersync.writeTransaction(async (tx) => {
-      if (photoRecord != null) {
-        await system.attachmentQueue.delete(photoRecord, tx);
-      }
-      await tx.executeAsync(`DELETE FROM ${TODO_TABLE} WHERE id = ?`, [record.id]);
-    });
-  };
-
-  const savePhoto = async (data: CameraCapturedPicture) => {
-    // We are sure the base64 is not null, as we are using the base64 option in the CameraWidget
-    const { id: photoId } = await system.attachmentQueue.savePhoto(data.base64!);
-
-    await system.powersync.execute(`UPDATE ${TODO_TABLE} SET photo_id = ? WHERE id = ?`, [photoId, record.id]);
-  };
-
-  return (
-    <TodoItemWidget
-      record={record}
-      photoAttachment={photoRecord}
-      onToggleCompletion={toggleCompletion}
-      onSavePhoto={savePhoto}
-      onDelete={deleteTodo}
-    />
-  );
+  return null;
 };

@@ -1,18 +1,32 @@
+import _ from 'lodash';
 import * as React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { ScrollView, View } from 'react-native';
 import { FAB } from 'react-native-elements';
 import prompt from 'react-native-prompt-android';
 
-import { Stack } from 'expo-router';
-import { LIST_TABLE, ListRecord } from '../../../library/powersync/AppSchema';
+import { router, Stack } from 'expo-router';
+import { LIST_TABLE, TODO_TABLE, ListRecord } from '../../../library/powersync/AppSchema';
 import { useSystem } from '../../../library/powersync/system';
 import { usePowerSyncWatchedQuery } from '@journeyapps/powersync-sdk-react-native';
-import { SmartListItemWidget } from '../../../library/widgets/smart/SmartListItemWidget';
+import { ListItemWidget } from '../../../library/widgets/ListItemWidget';
+
+const description = _.memoize((total: number, completed: number = 0) => {
+  return `${total - completed} pending, ${completed} completed`;
+});
 
 const ListsViewWidget: React.FC = () => {
   const system = useSystem();
-  const listRecords = usePowerSyncWatchedQuery<ListRecord>(`SELECT * from ${LIST_TABLE}`);
+  const listRecords = usePowerSyncWatchedQuery<ListRecord & { total_tasks: number; completed_tasks: number }>(`
+      SELECT 
+        ${LIST_TABLE}.*, COUNT(${LIST_TABLE}.id) AS total_tasks, SUM(CASE WHEN ${TODO_TABLE}.completed = true THEN 1 ELSE 0 END) as completed_tasks
+      FROM 
+        ${LIST_TABLE}
+      LEFT JOIN ${TODO_TABLE} 
+        ON  ${LIST_TABLE}.id = ${TODO_TABLE}.list_id
+      GROUP BY 
+        ${LIST_TABLE}.id;
+      `);
 
   const createNewList = async (name: string) => {
     const { userID } = await system.supabaseConnector.fetchCredentials();
@@ -26,6 +40,15 @@ const ListsViewWidget: React.FC = () => {
     if (!resultRecord) {
       throw new Error('Could not create list');
     }
+  };
+
+  const deleteList = async (id: string) => {
+    await system.powersync.writeTransaction(async (tx) => {
+      // Delete associated todos
+      await tx.executeAsync(`DELETE FROM ${TODO_TABLE} WHERE list_id = ?`, [id]);
+      // Delete list record
+      await tx.executeAsync(`DELETE FROM ${LIST_TABLE} WHERE id = ?`, [id]);
+    });
   };
 
   return (
@@ -56,7 +79,17 @@ const ListsViewWidget: React.FC = () => {
       />
       <ScrollView key={'lists'} style={{ maxHeight: '90%' }}>
         {listRecords.map((r) => (
-          <SmartListItemWidget key={r.id} record={r} />
+          <ListItemWidget
+            title={r.name}
+            description={description(r.total_tasks, r.completed_tasks)}
+            onDelete={() => deleteList(r.id)}
+            onPress={() => {
+              router.push({
+                pathname: 'views/todos/edit/[id]',
+                params: { id: r.id }
+              });
+            }}
+          />
         ))}
       </ScrollView>
 

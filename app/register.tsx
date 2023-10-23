@@ -4,7 +4,7 @@ import { View, Text, ActivityIndicator, Button } from 'react-native';
 import { router } from 'expo-router';
 
 import { useSystem } from '../library/powersync/system';
-import { TextInputWidget } from '../library/widgets/simple/TextInputWidget';
+import { TextInputWidget } from '../library/widgets/TextInputWidget';
 import { SignInStyles } from './signin';
 import { Icon } from 'react-native-elements';
 

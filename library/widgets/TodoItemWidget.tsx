@@ -3,11 +3,11 @@ import React from 'react';
 import { ActivityIndicator, Alert, View, Modal, StyleSheet } from 'react-native';
 import { ListItem, Button, Icon, Image } from 'react-native-elements';
 import { CameraWidget } from './CameraWidget';
-import { AttachmentRecord, TodoRecord } from '../../powersync/AppSchema';
+import { AttachmentRecord, TodoRecord } from '../powersync/AppSchema';
 
 export interface TodoItemWidgetProps {
   record: TodoRecord;
-  photoAttachment?: AttachmentRecord;
+  photoAttachment: AttachmentRecord | null;
   onSavePhoto: (data: CameraCapturedPicture) => Promise<void>;
   onToggleCompletion: (completed: boolean) => Promise<void>;
   onDelete?: () => Promise<void>;
