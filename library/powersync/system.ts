@@ -31,14 +31,8 @@ export class System {
     this.attachmentQueue = new AttachmentQueue({
       powersync: this.powersync,
       storage: this.storage,
-      getAttachmentIds: async () => {
-        const res = await this.powersync.execute(`SELECT photo_id
-                                          FROM
-                                            ${TODO_TABLE}
-                                          WHERE
-                                            photo_id IS NOT NULL`);
-        return res.rows?._array.map((r) => r.photo_id) || [];
-      }
+      attachmentIds: () =>
+        this.powersync.watch(`SELECT photo_id as id FROM ${TODO_TABLE} WHERE photo_id IS NOT NULL`, [])
     });
   }
 

@@ -80,6 +80,7 @@ const ListsViewWidget: React.FC = () => {
       <ScrollView key={'lists'} style={{ maxHeight: '90%' }}>
         {listRecords.map((r) => (
           <ListItemWidget
+            key={r.id}
             title={r.name}
             description={description(r.total_tasks, r.completed_tasks)}
             onDelete={() => deleteList(r.id)}

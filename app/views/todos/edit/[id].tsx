@@ -156,6 +156,7 @@ const TodoView: React.FC = () => {
           const photoRecord = toAttachmentRecord(r);
           return (
             <TodoItemWidget
+              key={r.todo_id}
               record={record}
               photoAttachment={photoRecord}
               onToggleCompletion={(completed) => toggleCompletion(record, completed)}

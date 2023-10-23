@@ -29,7 +29,8 @@ export enum AttachmentState {
   QUEUED_SYNC = 0, // WIll check if the attachment needs to be uploaded or downloaded
   QUEUED_UPLOAD = 1,
   QUEUED_DOWNLOAD = 2,
-  SYNCED = 3
+  SYNCED = 3,
+  ARCHIVED = 4 // Attachment hsa been orphaned
 }
 
 export interface AttachmentRecord {

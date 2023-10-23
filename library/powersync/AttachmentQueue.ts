@@ -1,4 +1,4 @@
-import { AbstractPowerSyncDatabase, Transaction } from '@journeyapps/powersync-sdk-react-native';
+import { AbstractPowerSyncDatabase, QueryResult, Transaction } from '@journeyapps/powersync-sdk-react-native';
 import * as FileSystem from 'expo-file-system';
 import { v4 as uuid } from 'uuid';
 import { ATTACHMENT_TABLE, AttachmentRecord, AttachmentState } from './AppSchema';
@@ -12,7 +12,7 @@ export const ATTACHMENT_CACHE_LIMIT = 100;
 export interface AttachmentQueueOptions {
   powersync: AbstractPowerSyncDatabase;
   storage: AbstractStorageAdapter;
-  getAttachmentIds?: () => Promise<string[]>;
+  attachmentIds?(): AsyncIterable<QueryResult>;
   syncInterval?: number;
   cacheLimit?: number;
 }
@@ -47,14 +47,10 @@ export class AttachmentQueue {
   }
 
   async init() {
-    // Ensure attachment directory exists
+    // Ensure the directory where attachments are downloaded, exists
     await this.storage.makeDir(ATTACHMENT_STORAGE_PATH);
 
-    const attachmentIds = (await this.options.getAttachmentIds?.()) || [];
-    if (attachmentIds.length > 0) {
-      await this.markForSync(attachmentIds);
-    }
-
+    this.watchAttachmentIds();
     this.watchUploads();
     this.watchDownloads();
 
@@ -65,6 +61,50 @@ export class AttachmentQueue {
     this.uploadRecords();
     this.downloadRecords();
     this.expireCache();
+  }
+
+  async watchAttachmentIds() {
+    if (!this.options.attachmentIds) {
+      return;
+    }
+    for await (const result of this.options.attachmentIds()) {
+      const ids = result.rows?._array.map((r) => r.id) || [];
+      console.log('watchAttachmentIds::ids', ids);
+
+      // Mark AttachmentIds for sync
+      await this.powersync.execute(
+        `UPDATE ${this.table} SET state = ${AttachmentState.QUEUED_SYNC} WHERE state < ${
+          AttachmentState.SYNCED
+        } id IN (${ids.map((id) => `'${id}'`).join(',')})`
+      );
+
+      const attachmentsInDatabase = await this.powersync.getAll<AttachmentRecord>(
+        `SELECT * FROM ${this.table} WHERE state < ${AttachmentState.ARCHIVED}`
+      );
+
+      for (const id of ids) {
+        const record = attachmentsInDatabase.find((r) => r.id == id);
+        // 1. ID is not in the database
+        if (!record) {
+          // TODO: This assumes all attachments are photos
+          const newRecord = this.newPhotoRecord({
+            id: id,
+            state: AttachmentState.QUEUED_SYNC
+          });
+          await this.saveToQueue(newRecord);
+        } else if (record.local_uri == null || !(await this.storage.fileExists(record.local_uri))) {
+          // 2. Attachment in database but no local file, mark as queued download
+          await this.update({ ...record, state: AttachmentState.QUEUED_DOWNLOAD });
+        }
+      }
+
+      // 3. Attachment in database and not in AttachmentIds, mark as archived
+      await this.powersync.execute(
+        `UPDATE ${this.table} SET state = ${AttachmentState.ARCHIVED} WHERE state < ${
+          AttachmentState.ARCHIVED
+        } AND id NOT IN (${ids.map((id) => `'${id}'`).join(',')})`
+      );
+    }
   }
 
   async getAttachmentRecord(id: string): Promise<AttachmentRecord | null> {
@@ -120,17 +160,6 @@ export class AttachmentQueue {
              WHERE id = ?`,
       [timestamp, record.filename, record.local_uri || null, record.size, record.media_type, record.state, record.id]
     );
-  }
-
-  async markForSync(ids: string[]): Promise<void> {
-    if (ids.length > 0) {
-      // Mark attachments for sync
-      await this.powersync.execute(
-        `UPDATE ${this.table} SET state = ${AttachmentState.QUEUED_SYNC} WHERE id IN (${ids
-          .map((id) => `'${id}'`)
-          .join(',')})`
-      );
-    }
   }
 
   async delete(record: AttachmentRecord, tx?: Transaction): Promise<void> {
@@ -282,7 +311,7 @@ export class AttachmentQueue {
       while (record) {
         const uploaded = await this.uploadAttachment(record);
         if (!uploaded) {
-          // TODO: we need to retry
+          // TODO: Retry
           break;
         }
         record = await this.getNextUploadRecord();
@@ -298,12 +327,12 @@ export class AttachmentQueue {
   async getIdsToDownload(): Promise<string[]> {
     const res = await this.powersync.getAll<{ id: string }>(
       `SELECT id
-                FROM ${this.table} 
-                WHERE
-                  state = ${AttachmentState.QUEUED_DOWNLOAD} 
-                OR
-                  state = ${AttachmentState.QUEUED_SYNC}
-                ORDER BY timestamp ASC`
+              FROM ${this.table} 
+              WHERE
+                state = ${AttachmentState.QUEUED_DOWNLOAD} 
+              OR
+                state = ${AttachmentState.QUEUED_SYNC}
+              ORDER BY timestamp ASC`
     );
     return res.map((r) => r.id);
   }
@@ -330,22 +359,17 @@ export class AttachmentQueue {
   }
 
   private async downloadRecords() {
-    if (this.downloading) {
+    if (this.downloading || this.downloadQueue.size == 0) {
       return;
     }
     this.downloading = true;
     try {
-      if (this.downloadQueue.size == 0) {
-        this.downloading = false;
-        return;
-      }
       console.debug(`Downloading ${this.downloadQueue.size} attachments...`);
       while (this.downloadQueue.size > 0) {
         const id = this.downloadQueue.values().next().value;
         this.downloadQueue.delete(id);
         const record = await this.getAttachmentRecord(id);
         if (!record) {
-          this.downloadQueue.delete(id);
           continue;
         }
         await this.downloadRecord(record);
@@ -354,6 +378,7 @@ export class AttachmentQueue {
     } catch (e) {
       console.error('Downloads failed:', e);
     } finally {
+      // We add the remaining ids to the queue, to retry in the next loop
       (await this.getIdsToDownload()).map((id) => this.downloadQueue.add(id));
       this.downloading = false;
     }
@@ -378,7 +403,7 @@ export class AttachmentQueue {
   async expireCache() {
     const res = await this.powersync.getAll<AttachmentRecord>(`SELECT * FROM ${this.table} 
           WHERE 
-           state = ${AttachmentState.SYNCED}
+           state = ${AttachmentState.SYNCED} OR state = ${AttachmentState.ARCHIVED}
          ORDER BY 
            timestamp DESC
          LIMIT 100 OFFSET ${this.options.cacheLimit}`);
