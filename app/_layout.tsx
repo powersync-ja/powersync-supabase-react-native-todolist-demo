@@ -23,7 +23,7 @@ const HomeLayout = () => {
     return system.powersync;
   }, []);
   return (
-    <PowerSyncContext.Provider value={db as any}>
+    <PowerSyncContext.Provider value={db}>
       <Stack screenOptions={{ headerTintColor: '#fff', headerStyle: { backgroundColor: '#2196f3' } }}>
         <Stack.Screen name="signin" options={{ title: 'Supabase Login' }} />
         <Stack.Screen name="register" options={{ title: 'Register' }} />
