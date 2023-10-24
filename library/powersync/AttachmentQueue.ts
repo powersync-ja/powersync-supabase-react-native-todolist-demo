@@ -54,6 +54,8 @@ export class AttachmentQueue {
     this.watchUploads();
     this.watchDownloads();
 
+    // In addition to watching for changes, we also trigger a sync every few seconds (30 seconds, by default)
+    // This will retry any failed uploads/downloads, in particular after the app was offline
     setInterval(() => this.trigger(), ATTACHMENT_QUEUE_INTERVAL);
   }
 
@@ -69,8 +71,9 @@ export class AttachmentQueue {
     }
     for await (const result of this.options.attachmentIds()) {
       const ids = result.rows?._array.map((r) => r.id) || [];
-      console.log('watchAttachmentIds::ids', ids);
 
+      const _ids = `(${ids.map((id) => `'${id}'`).join(',')})`;
+      console.debug(`Queuing for sync, attachment IDs: ${_ids}`);
       // Mark AttachmentIds for sync
       await this.powersync.execute(
         `UPDATE 
@@ -79,7 +82,7 @@ export class AttachmentQueue {
               WHERE 
                 state < ${AttachmentState.SYNCED} 
               AND
-               id IN (${ids.map((id) => `'${id}'`).join(',')})`
+               id IN ${_ids}`
       );
 
       const attachmentsInDatabase = await this.powersync.getAll<AttachmentRecord>(
@@ -90,14 +93,16 @@ export class AttachmentQueue {
         const record = attachmentsInDatabase.find((r) => r.id == id);
         // 1. ID is not in the database
         if (!record) {
-          // TODO: This assumes all attachments are photos
+          // TODO: NOTE: This assumes all attachments are photos
           const newRecord = this.newPhotoRecord({
             id: id,
             state: AttachmentState.QUEUED_SYNC
           });
+          console.debug(`Attachment (${id}) not found in database, creating new record`);
           await this.saveToQueue(newRecord);
         } else if (record.local_uri == null || !(await this.storage.fileExists(record.local_uri))) {
           // 2. Attachment in database but no local file, mark as queued download
+          console.debug(`Attachment (${id}) found in database but no local file, marking as queued download`);
           await this.update({ ...record, state: AttachmentState.QUEUED_DOWNLOAD });
         }
       }
@@ -363,9 +368,14 @@ export class AttachmentQueue {
   }
 
   private async downloadRecords() {
-    if (this.downloading || this.downloadQueue.size == 0) {
+    if (this.downloading) {
       return;
     }
+    (await this.getIdsToDownload()).map((id) => this.downloadQueue.add(id));
+    if (this.downloadQueue.size == 0) {
+      return;
+    }
+
     this.downloading = true;
     try {
       console.debug(`Downloading ${this.downloadQueue.size} attachments...`);
@@ -382,8 +392,6 @@ export class AttachmentQueue {
     } catch (e) {
       console.error('Downloads failed:', e);
     } finally {
-      // We add the remaining ids to the queue, to retry in the next loop
-      (await this.getIdsToDownload()).map((id) => this.downloadQueue.add(id));
       this.downloading = false;
     }
   }

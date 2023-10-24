@@ -17,15 +17,10 @@ export const TodoItemWidget: React.FC<TodoItemWidgetProps> = (props) => {
   const { record, photoAttachment, onDelete, onToggleCompletion, onSavePhoto } = props;
   const [loading, setLoading] = React.useState(false);
   const [isCameraVisible, setCameraVisible] = React.useState(false);
-  const [, forceUpdate] = React.useState({});
 
   const handleCancel = React.useCallback(() => {
     setCameraVisible(false);
   }, []);
-
-  React.useEffect(() => {
-    forceUpdate({});
-  }, [photoAttachment?.state]);
 
   return (
     <View key={`todo-item-${record.id}`} style={{ padding: 10 }}>

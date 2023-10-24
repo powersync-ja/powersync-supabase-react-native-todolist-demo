@@ -11,9 +11,9 @@ import { PowerSyncContext } from '@journeyapps/powersync-sdk-react-native';
  *      - Register
  *  - Views: App views once authenticated. The only way to navigate back is to sign out
  *      * Second layer: Uses a navigation drawer, navigating to any of these views replaces the current view. The first layer stack is hidden.
- *          - Todo Lists (exposes another stack in order to edit a specific list)
+ *          - TodoLists (exposes another stack in order to edit a specific list)
  *              - Third layer: Edit stack
- *                * Edit [todo list] can navigate back to Todo Lists
+ *                * Edit [todolist] can navigate back to TodoLists
  *          - SQL Console
  *          - Sign out. Psuedo view to initiate signout flow. Navigates back to first layer.
  */

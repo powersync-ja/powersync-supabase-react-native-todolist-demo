@@ -5,11 +5,13 @@ import { Icon } from 'react-native-elements';
 import { useNavigation } from 'expo-router';
 import { Header } from 'react-native-elements';
 import { DrawerActions } from '@react-navigation/native';
+import { useSystem } from '../powersync/system';
 
 export const HeaderWidget: React.FC<{
   title?: string;
 }> = (props) => {
-  const powersync: AbstractPowerSyncDatabase = usePowerSync();
+  const system = useSystem();
+  const { powersync } = system;
   const navigation = useNavigation();
   const [connected, setConnected] = React.useState(powersync.connected);
 
@@ -43,6 +45,7 @@ export const HeaderWidget: React.FC<{
           size={20}
           style={{ padding: 5 }}
           onPress={() => {
+            system.attachmentQueue.trigger();
             Alert.alert(
               'Status',
               `${connected ? 'Connected' : 'Disconnected'}. \nLast Synced at ${

@@ -58,7 +58,9 @@ const TodoView: React.FC = () => {
             ${ATTACHMENT_TABLE} ON ${TODO_TABLE}.photo_id = ${ATTACHMENT_TABLE}.id
         WHERE 
             ${TODO_TABLE}.list_id = ?`,
-    [listID]
+    [listID],
+    // NOTE: It is important to add the tables to the watch list, otherwise the query will not be re-executed
+    { tables: [TODO_TABLE, ATTACHMENT_TABLE, LIST_TABLE] }
   );
 
   const toggleCompletion = async (record: TodoRecord, completed: boolean) => {
