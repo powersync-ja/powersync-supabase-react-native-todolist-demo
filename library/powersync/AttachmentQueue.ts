@@ -73,9 +73,13 @@ export class AttachmentQueue {
 
       // Mark AttachmentIds for sync
       await this.powersync.execute(
-        `UPDATE ${this.table} SET state = ${AttachmentState.QUEUED_SYNC} WHERE state < ${
-          AttachmentState.SYNCED
-        } id IN (${ids.map((id) => `'${id}'`).join(',')})`
+        `UPDATE 
+                ${this.table} 
+              SET state = ${AttachmentState.QUEUED_SYNC} 
+              WHERE 
+                state < ${AttachmentState.SYNCED} 
+              AND
+               id IN (${ids.map((id) => `'${id}'`).join(',')})`
       );
 
       const attachmentsInDatabase = await this.powersync.getAll<AttachmentRecord>(
