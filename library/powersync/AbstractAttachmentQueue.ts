@@ -1,38 +1,48 @@
-import { AbstractPowerSyncDatabase, QueryResult, Transaction } from '@journeyapps/powersync-sdk-react-native';
-import * as FileSystem from 'expo-file-system';
-import { v4 as uuid } from 'uuid';
+import { AbstractPowerSyncDatabase, Transaction } from '@journeyapps/powersync-sdk-react-native';
 import { ATTACHMENT_TABLE, AttachmentRecord, AttachmentState } from './AppSchema';
-import { AbstractStorageAdapter, UploadOptions } from '../storage/AbstractStorageAdapter';
+import { AbstractStorageAdapter, EncodingType } from '../storage/AbstractStorageAdapter';
 
-export const ATTACHMENT_LOCAL_STORAGE_KEY = 'attachments';
-export const ATTACHMENT_STORAGE_PATH = `${FileSystem.documentDirectory}${ATTACHMENT_LOCAL_STORAGE_KEY}`;
+export const ATTACHMENT_LOCAL_STORAGE_DIR = 'attachments';
 export const ATTACHMENT_QUEUE_INTERVAL = 30_000;
 export const ATTACHMENT_CACHE_LIMIT = 100;
 
 export interface AttachmentQueueOptions {
   powersync: AbstractPowerSyncDatabase;
   storage: AbstractStorageAdapter;
-  attachmentIds?(): AsyncIterable<QueryResult>;
   syncInterval?: number;
   cacheLimit?: number;
+  attachmentDirectoryName?: string;
 }
 
-export class AttachmentQueue {
+export abstract class AbstractAttachmentQueue {
   uploading: boolean;
   downloading: boolean;
+  firstSync: boolean;
   options: AttachmentQueueOptions;
   downloadQueue: Set<string>;
 
   constructor(options: AttachmentQueueOptions) {
-    this.uploading = false;
-    this.downloading = false;
     this.options = {
       ...options,
+      attachmentDirectoryName: options.attachmentDirectoryName ?? ATTACHMENT_LOCAL_STORAGE_DIR,
       syncInterval: options.syncInterval ?? ATTACHMENT_QUEUE_INTERVAL,
       cacheLimit: options.cacheLimit ?? ATTACHMENT_CACHE_LIMIT
     };
     this.downloadQueue = new Set<string>();
+    this.uploading = false;
+    this.downloading = false;
+    this.firstSync = true;
   }
+
+  /**
+   * Returns an async iterator that yields attachment IDs that need to be synced.
+   * In most cases this will be a watch query, for example:
+   *
+   * for await (const result of powersync.watch('SELECT photo_id as id FROM todos WHERE photo_id IS NOT NULL', [])) {...}
+   */
+  abstract attachmentIds(): AsyncIterable<string[]>;
+
+  abstract newAttachmentRecord(record?: Partial<AttachmentRecord>): AttachmentRecord;
 
   protected get powersync() {
     return this.options.powersync;
@@ -46,9 +56,13 @@ export class AttachmentQueue {
     return ATTACHMENT_TABLE;
   }
 
+  get storageDirectory() {
+    return `${this.storage.getUserStorageDirectory()}${this.options.attachmentDirectoryName}`;
+  }
+
   async init() {
     // Ensure the directory where attachments are downloaded, exists
-    await this.storage.makeDir(ATTACHMENT_STORAGE_PATH);
+    await this.storage.makeDir(this.storageDirectory);
 
     this.watchAttachmentIds();
     this.watchUploads();
@@ -66,24 +80,22 @@ export class AttachmentQueue {
   }
 
   async watchAttachmentIds() {
-    if (!this.options.attachmentIds) {
-      return;
-    }
-    for await (const result of this.options.attachmentIds()) {
-      const ids = result.rows?._array.map((r) => r.id) || [];
-
-      const _ids = `(${ids.map((id) => `'${id}'`).join(',')})`;
-      console.debug(`Queuing for sync, attachment IDs: ${_ids}`);
-      // Mark AttachmentIds for sync
-      await this.powersync.execute(
-        `UPDATE 
+    for await (const ids of this.attachmentIds()) {
+      const _ids = `${ids.map((id) => `'${id}'`).join(',')}`;
+      console.debug(`Queuing for sync, attachment IDs: [${_ids}]`);
+      if (this.firstSync) {
+        this.firstSync = false;
+        // Mark AttachmentIds for sync
+        await this.powersync.execute(
+          `UPDATE 
                 ${this.table} 
               SET state = ${AttachmentState.QUEUED_SYNC} 
               WHERE 
                 state < ${AttachmentState.SYNCED} 
               AND
-               id IN ${_ids}`
-      );
+               id IN (${_ids})`
+        );
+      }
 
       const attachmentsInDatabase = await this.powersync.getAll<AttachmentRecord>(
         `SELECT * FROM ${this.table} WHERE state < ${AttachmentState.ARCHIVED}`
@@ -93,8 +105,7 @@ export class AttachmentQueue {
         const record = attachmentsInDatabase.find((r) => r.id == id);
         // 1. ID is not in the database
         if (!record) {
-          // TODO: NOTE: This assumes all attachments are photos
-          const newRecord = this.newPhotoRecord({
+          const newRecord = this.newAttachmentRecord({
             id: id,
             state: AttachmentState.QUEUED_SYNC
           });
@@ -114,23 +125,6 @@ export class AttachmentQueue {
         } AND id NOT IN (${ids.map((id) => `'${id}'`).join(',')})`
       );
     }
-  }
-
-  async getAttachmentRecord(id: string): Promise<AttachmentRecord | null> {
-    return this.powersync.getOptional<AttachmentRecord>(`SELECT * FROM ${this.table} WHERE id = ?`, [id]);
-  }
-
-  async savePhoto(base64Data: string): Promise<AttachmentRecord> {
-    const photoAttachment = this.newPhotoRecord();
-    photoAttachment.local_uri = this.getLocalUri(photoAttachment.filename);
-    await this.storage.writeFile(photoAttachment.local_uri!, base64Data, { encoding: FileSystem.EncodingType.Base64 });
-
-    const fileInfo = await FileSystem.getInfoAsync(photoAttachment.local_uri!);
-    if (fileInfo.exists) {
-      photoAttachment.size = fileInfo.size;
-    }
-
-    return this.saveToQueue(photoAttachment);
   }
 
   async saveToQueue(record: Omit<AttachmentRecord, 'timestamp'>): Promise<AttachmentRecord> {
@@ -153,6 +147,10 @@ export class AttachmentQueue {
     );
 
     return updatedRecord;
+  }
+
+  async record(id: string): Promise<AttachmentRecord | null> {
+    return this.powersync.getOptional<AttachmentRecord>(`SELECT * FROM ${this.table} WHERE id = ?`, [id]);
   }
 
   async update(record: Omit<AttachmentRecord, 'timestamp'>): Promise<void> {
@@ -187,7 +185,9 @@ export class AttachmentQueue {
       await this.powersync.writeTransaction(deleteRecord);
     }
     // Delete file on storage
-    return this.storage.deleteFile(record.filename, record.local_uri || this.getLocalUri(record.filename));
+    return this.storage.deleteFile(record.local_uri || this.getLocalUri(record.filename), {
+      filename: record.filename
+    });
   }
 
   async getNextUploadRecord(): Promise<AttachmentRecord | null> {
@@ -216,16 +216,11 @@ export class AttachmentQueue {
       }
 
       const fileBuffer = await this.storage.readFile(record.local_uri, {
-        encoding: FileSystem.EncodingType.Base64,
+        encoding: EncodingType.Base64,
         mediaType: record.media_type
       });
 
-      const options: UploadOptions = {};
-      if (record.media_type) {
-        options.mediaType = record.media_type;
-      }
-
-      await this.storage.uploadFile(record.filename, fileBuffer, options);
+      await this.storage.uploadFile(record.filename, fileBuffer, { mediaType: record.media_type });
       // Mark as uploaded
       await this.update({ ...record, state: AttachmentState.SYNCED });
       console.debug(`Uploaded attachment "${record.id}" to Cloud Storage`);
@@ -268,7 +263,7 @@ export class AttachmentQueue {
       // Ensure directory exists
       await this.storage.makeDir(record.local_uri.replace(record.filename, ''));
       // Write the file
-      await this.storage.writeFile(record.local_uri, base64Data, { encoding: FileSystem.EncodingType.Base64 });
+      await this.storage.writeFile(record.local_uri, base64Data, { encoding: EncodingType.Base64 });
 
       await this.update({ ...record, media_type: fileBlob.type, state: AttachmentState.SYNCED });
       console.debug(`Downloaded attachment "${record.id}"`);
@@ -382,7 +377,7 @@ export class AttachmentQueue {
       while (this.downloadQueue.size > 0) {
         const id = this.downloadQueue.values().next().value;
         this.downloadQueue.delete(id);
-        const record = await this.getAttachmentRecord(id);
+        const record = await this.record(id);
         if (!record) {
           continue;
         }
@@ -397,19 +392,7 @@ export class AttachmentQueue {
   }
 
   getLocalUri(filename: string): string {
-    return `${ATTACHMENT_STORAGE_PATH}/${filename}`;
-  }
-
-  newPhotoRecord(record?: Partial<AttachmentRecord>): AttachmentRecord {
-    const photoId = record?.id ?? uuid();
-    const filename = record?.filename ?? `${photoId}.jpg`;
-    return {
-      id: photoId,
-      filename,
-      media_type: 'image/jpeg',
-      state: AttachmentState.QUEUED_UPLOAD,
-      ...record
-    };
+    return `${this.storageDirectory}/${filename}`;
   }
 
   async expireCache() {

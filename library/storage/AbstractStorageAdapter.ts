@@ -1,68 +1,36 @@
 import { decode as decodeBase64 } from 'base64-arraybuffer';
-import * as FileSystem from 'expo-file-system';
+
+export enum EncodingType {
+  UTF8 = 'utf8',
+  Base64 = 'base64'
+}
 
 export interface BaseStorageAdapterOptions {}
-
-export interface UploadOptions {
-  mediaType?: string;
-}
 
 export abstract class AbstractStorageAdapter<T extends BaseStorageAdapterOptions = BaseStorageAdapterOptions> {
   constructor(protected options: T) {}
 
-  abstract uploadFile(filePath: string, data: ArrayBuffer, options?: UploadOptions): Promise<void>;
+  abstract uploadFile(filePath: string, data: ArrayBuffer, options?: { mediaType?: string }): Promise<void>;
 
   abstract downloadFile(filePath: string): Promise<Blob>;
 
-  async writeFile(
-    fileURI: string,
-    base64Data: string,
-    options: {
-      encoding: FileSystem.EncodingType;
-    }
-  ): Promise<void> {
-    await FileSystem.writeAsStringAsync(fileURI, base64Data, options);
-  }
+  abstract writeFile(fileURI: string, base64Data: string, options?: { encoding?: EncodingType }): Promise<void>;
 
-  async readFile(
-    fileURI: string,
-    options: { encoding: FileSystem.EncodingType; mediaType?: string }
-  ): Promise<ArrayBuffer> {
-    const { exists } = await FileSystem.getInfoAsync(fileURI);
-    if (!exists) {
-      throw new Error(`File does not exist: ${fileURI}`);
-    }
-    const fileContent = await FileSystem.readAsStringAsync(fileURI, options);
-    if (options.encoding === FileSystem.EncodingType.Base64) {
-      return base64ToArrayBuffer(fileContent);
-    }
-    return stringToArrayBuffer(fileContent);
-  }
+  abstract readFile(fileURI: string, options?: { encoding?: EncodingType; mediaType?: string }): Promise<ArrayBuffer>;
 
-  async fileExists(fileURI: string): Promise<boolean> {
-    const { exists } = await FileSystem.getInfoAsync(fileURI);
-    return exists;
-  }
+  abstract deleteFile(uri: string, options?: { filename?: string }): Promise<void>;
 
-  async makeDir(uri: string): Promise<void> {
-    const { exists } = await FileSystem.getInfoAsync(uri);
-    if (!exists) {
-      await FileSystem.makeDirectoryAsync(uri, { intermediates: true });
-    }
-  }
+  abstract fileExists(fileURI: string): Promise<boolean>;
 
-  async copyFile(sourceUri: string, targetUri: string): Promise<void> {
-    await FileSystem.copyAsync({ from: sourceUri, to: targetUri });
-  }
+  abstract makeDir(uri: string): Promise<void>;
 
-  async deleteFile(filename: string, uri?: string): Promise<void> {
-    if (!uri) {
-      return;
-    }
-    if (await this.fileExists(uri)) {
-      await FileSystem.deleteAsync(uri);
-    }
-  }
+  abstract copyFile(sourceUri: string, targetUri: string): Promise<void>;
+
+  /**
+   * Returns the directory where user data is stored.
+   * Should end with a '/'
+   */
+  abstract getUserStorageDirectory(): string;
 }
 
 export const stringToArrayBuffer = async (str: string): Promise<ArrayBuffer> => {

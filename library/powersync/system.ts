@@ -3,11 +3,11 @@ import 'react-native-polyfill-globals/auto';
 import React from 'react';
 import { AbstractPowerSyncDatabase, RNQSPowerSyncDatabaseOpenFactory } from '@journeyapps/powersync-sdk-react-native';
 
-import { AppSchema, TODO_TABLE } from './AppSchema';
+import { AppSchema } from './AppSchema';
 import { AbstractStorageAdapter } from '../storage/AbstractStorageAdapter';
 import { SupabaseConnector } from '../supabase/SupabaseConnector';
 import { KVStorage } from '../storage/KVStorage';
-import { AttachmentQueue } from './AttachmentQueue';
+import { PhotoAttachmentQueue } from './PhotoAttachmentQueue';
 
 export class System {
   kvStorage: KVStorage;
@@ -15,7 +15,7 @@ export class System {
   supabaseConnector: SupabaseConnector;
   powersync: AbstractPowerSyncDatabase;
 
-  attachmentQueue: AttachmentQueue;
+  attachmentQueue: PhotoAttachmentQueue;
 
   constructor() {
     this.kvStorage = new KVStorage();
@@ -28,11 +28,9 @@ export class System {
     this.storage = this.supabaseConnector.storage;
     this.powersync = factory.getInstance();
 
-    this.attachmentQueue = new AttachmentQueue({
+    this.attachmentQueue = new PhotoAttachmentQueue({
       powersync: this.powersync,
-      storage: this.storage,
-      attachmentIds: () =>
-        this.powersync.watch(`SELECT photo_id as id FROM ${TODO_TABLE} WHERE photo_id IS NOT NULL`, [])
+      storage: this.storage
     });
   }
 
