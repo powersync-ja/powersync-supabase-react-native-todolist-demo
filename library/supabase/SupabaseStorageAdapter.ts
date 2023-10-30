@@ -1,4 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
+import { AppConfig } from './AppConfig';
 import { AbstractStorageAdapter, BaseStorageAdapterOptions, UploadOptions } from '../storage/AbstractStorageAdapter';
 
 export interface SupabaseStorageAdapterOptions extends BaseStorageAdapterOptions {
@@ -6,15 +7,13 @@ export interface SupabaseStorageAdapterOptions extends BaseStorageAdapterOptions
 }
 
 export class SupabaseStorageAdapter extends AbstractStorageAdapter<SupabaseStorageAdapterOptions> {
-  static BUCKET_NAME = 'media';
-
   constructor(options: SupabaseStorageAdapterOptions) {
     super(options);
   }
 
   async uploadFile(filename: string, data: ArrayBuffer, options: UploadOptions): Promise<void> {
     const res = await this.options.client.storage
-      .from(SupabaseStorageAdapter.BUCKET_NAME)
+      .from(AppConfig.supabaseBucket)
       .upload(filename, data, { contentType: options.mediaType });
 
     if (res.error) {
@@ -23,9 +22,7 @@ export class SupabaseStorageAdapter extends AbstractStorageAdapter<SupabaseStora
   }
 
   async downloadFile(filePath: string) {
-    const { data, error } = await this.options.client.storage
-      .from(SupabaseStorageAdapter.BUCKET_NAME)
-      .download(filePath);
+    const { data, error } = await this.options.client.storage.from(AppConfig.supabaseBucket).download(filePath);
 
     if (error) {
       throw error;
@@ -37,9 +34,7 @@ export class SupabaseStorageAdapter extends AbstractStorageAdapter<SupabaseStora
   async deleteFile(filename: string, uri?: string): Promise<void> {
     await super.deleteFile(filename, uri);
 
-    const { data, error } = await this.options.client.storage
-      .from(SupabaseStorageAdapter.BUCKET_NAME)
-      .remove([filename]);
+    const { data, error } = await this.options.client.storage.from(AppConfig.supabaseBucket).remove([filename]);
 
     if (error) {
       console.debug('Failed to delete file from storage', error);
