@@ -1,9 +1,20 @@
 import * as FileSystem from 'expo-file-system';
 import { v4 as uuid } from 'uuid';
+import { AppConfig } from '../supabase/AppConfig';
 import { AbstractAttachmentQueue } from './AbstractAttachmentQueue';
 import { AttachmentRecord, AttachmentState, TODO_TABLE } from './AppSchema';
 
 export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
+  async init() {
+    if (!AppConfig.supabaseBucket) {
+      console.debug('No Supabase bucket configured, skipping setting up PhotoAttachmentQueue watches');
+      // No-op trigger sync
+      this.trigger = () => {};
+      return;
+    }
+    return super.init();
+  }
+
   async *attachmentIds(): AsyncIterable<string[]> {
     for await (const result of this.powersync.watch(
       `SELECT photo_id as id FROM ${TODO_TABLE} WHERE photo_id IS NOT NULL`,

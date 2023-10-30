@@ -17,7 +17,7 @@ export interface AttachmentQueueOptions {
 export abstract class AbstractAttachmentQueue<T extends AttachmentQueueOptions = AttachmentQueueOptions> {
   uploading: boolean;
   downloading: boolean;
-  firstSync: boolean;
+  initialSync: boolean;
   options: T;
   downloadQueue: Set<string>;
 
@@ -31,7 +31,10 @@ export abstract class AbstractAttachmentQueue<T extends AttachmentQueueOptions =
     this.downloadQueue = new Set<string>();
     this.uploading = false;
     this.downloading = false;
-    this.firstSync = true;
+    this.initialSync = true;
+
+    // Ensure the directory where attachments are downloaded, exists
+    this.storage.makeDir(this.storageDirectory);
   }
 
   /**
@@ -61,9 +64,6 @@ export abstract class AbstractAttachmentQueue<T extends AttachmentQueueOptions =
   }
 
   async init() {
-    // Ensure the directory where attachments are downloaded, exists
-    await this.storage.makeDir(this.storageDirectory);
-
     this.watchAttachmentIds();
     this.watchUploads();
     this.watchDownloads();
@@ -83,8 +83,9 @@ export abstract class AbstractAttachmentQueue<T extends AttachmentQueueOptions =
     for await (const ids of this.attachmentIds()) {
       const _ids = `${ids.map((id) => `'${id}'`).join(',')}`;
       console.debug(`Queuing for sync, attachment IDs: [${_ids}]`);
-      if (this.firstSync) {
-        this.firstSync = false;
+
+      if (this.initialSync) {
+        this.initialSync = false;
         // Mark AttachmentIds for sync
         await this.powersync.execute(
           `UPDATE 
@@ -184,10 +185,17 @@ export abstract class AbstractAttachmentQueue<T extends AttachmentQueueOptions =
     } else {
       await this.powersync.writeTransaction(deleteRecord);
     }
-    // Delete file on storage
-    return this.storage.deleteFile(record.local_uri || this.getLocalUri(record.filename), {
-      filename: record.filename
-    });
+
+    const uri = record.local_uri || this.getLocalUri(record.filename);
+
+    try {
+      // Delete file on storage
+      await this.storage.deleteFile(uri, {
+        filename: record.filename
+      });
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async getNextUploadRecord(): Promise<AttachmentRecord | null> {
@@ -415,9 +423,9 @@ export abstract class AbstractAttachmentQueue<T extends AttachmentQueueOptions =
     });
   }
 
-  clearQueue(): Promise<void> {
+  async clearQueue(): Promise<void> {
     console.debug(`Clearing attachment queue...`);
-    return this.powersync.writeTransaction(async (tx) => {
+    await this.powersync.writeTransaction(async (tx) => {
       await tx.executeAsync(`DELETE FROM ${this.table}`);
     });
   }

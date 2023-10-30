@@ -13,10 +13,6 @@ export interface SupabaseStorageAdapterOptions extends BaseStorageAdapterOptions
 }
 
 export class SupabaseStorageAdapter extends AbstractStorageAdapter<SupabaseStorageAdapterOptions> {
-  constructor(options: SupabaseStorageAdapterOptions) {
-    super(options);
-  }
-
   async uploadFile(
     filename: string,
     data: ArrayBuffer,
@@ -24,6 +20,10 @@ export class SupabaseStorageAdapter extends AbstractStorageAdapter<SupabaseStora
       mediaType?: string;
     }
   ): Promise<void> {
+    if (!AppConfig.supabaseBucket) {
+      throw new Error('Supabase bucket not configured in AppConfig.ts');
+    }
+
     const { mediaType = 'text/plain' } = options ?? {};
 
     const res = await this.options.client.storage
@@ -36,6 +36,9 @@ export class SupabaseStorageAdapter extends AbstractStorageAdapter<SupabaseStora
   }
 
   async downloadFile(filePath: string) {
+    if (!AppConfig.supabaseBucket) {
+      throw new Error('Supabase bucket not configured in AppConfig.ts');
+    }
     const { data, error } = await this.options.client.storage.from(AppConfig.supabaseBucket).download(filePath);
     if (error) {
       throw error;
@@ -80,9 +83,13 @@ export class SupabaseStorageAdapter extends AbstractStorageAdapter<SupabaseStora
       return;
     }
 
+    if (!AppConfig.supabaseBucket) {
+      throw new Error('Supabase bucket not configured in AppConfig.ts');
+    }
+
     const { data, error } = await this.options.client.storage.from(AppConfig.supabaseBucket).remove([filename]);
     if (error) {
-      console.debug('Failed to delete file from storage', error);
+      console.debug('Failed to delete file from Cloud Storage', error);
       throw error;
     }
 
