@@ -14,14 +14,14 @@ export interface AttachmentQueueOptions {
   attachmentDirectoryName?: string;
 }
 
-export abstract class AbstractAttachmentQueue {
+export abstract class AbstractAttachmentQueue<T extends AttachmentQueueOptions = AttachmentQueueOptions> {
   uploading: boolean;
   downloading: boolean;
   firstSync: boolean;
-  options: AttachmentQueueOptions;
+  options: T;
   downloadQueue: Set<string>;
 
-  constructor(options: AttachmentQueueOptions) {
+  constructor(options: T) {
     this.options = {
       ...options,
       attachmentDirectoryName: options.attachmentDirectoryName ?? ATTACHMENT_LOCAL_STORAGE_DIR,
@@ -416,11 +416,9 @@ export abstract class AbstractAttachmentQueue {
   }
 
   clearQueue(): Promise<void> {
+    console.debug(`Clearing attachment queue...`);
     return this.powersync.writeTransaction(async (tx) => {
-      await tx.executeAsync(
-        `DELETE
-             FROM ${this.table}`
-      );
+      await tx.executeAsync(`DELETE FROM ${this.table}`);
     });
   }
 }
