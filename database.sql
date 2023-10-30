@@ -19,6 +19,7 @@ create table
     created_by uuid null,
     completed_by uuid null,
     list_id uuid not null,
+    photo_id uuid null,
     constraint todos_pkey primary key (id),
     constraint todos_created_by_fkey foreign key (created_by) references auth.users (id) on delete set null,
     constraint todos_completed_by_fkey foreign key (completed_by) references auth.users (id) on delete set null,
