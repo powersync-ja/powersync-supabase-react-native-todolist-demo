@@ -1,3 +1,4 @@
+import { AttachmentTable } from '@journeyapps/powersync-attachments';
 import { Column, ColumnType, Index, IndexedColumn, Schema, Table } from '@journeyapps/powersync-sdk-react-native';
 
 export const TODO_TABLE = 'todos';
@@ -21,7 +22,7 @@ export interface TodoRecord {
   completed_by?: string;
   list_id: string;
 
-  photo_id?: string; // This is the attachment id, 1:1 relationship
+  photo_id?: string; // This is the attachment id, 1:1 relationship with `id` in AttachmentTable
 }
 
 export const AppSchema = new Schema([
@@ -51,5 +52,7 @@ export const AppSchema = new Schema([
       new Column({ name: 'name', type: ColumnType.TEXT }),
       new Column({ name: 'owner_id', type: ColumnType.TEXT })
     ]
-  })
+  }),
+  // Add Attachment table
+  new AttachmentTable()
 ]);

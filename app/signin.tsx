@@ -8,7 +8,7 @@ import { TextInputWidget } from '../library/widgets/TextInputWidget';
 import { Icon } from 'react-native-elements';
 
 export default function Signin() {
-  const { supabaseConnector, attachmentQueue } = useSystem();
+  const { supabaseConnector } = useSystem();
   const [loading, setLoading] = React.useState(false);
   const [credentials, setCredentials] = React.useState({ username: '', password: '' });
   const [error, setError] = React.useState('');
@@ -43,7 +43,6 @@ export default function Signin() {
                 setError('');
                 try {
                   await supabaseConnector.login(credentials.username, credentials.password);
-                  await attachmentQueue.clearQueue();
                   router.replace('views/todos/lists');
                 } catch (ex: any) {
                   console.error(ex);

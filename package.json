@@ -10,7 +10,7 @@
   "dependencies": {
     "@azure/core-asynciterator-polyfill": "^1.0.2",
     "@expo/vector-icons": "^13.0.0",
-    "@journeyapps/powersync-attachments": "0.0.0-dev-20231031141050",
+    "@journeyapps/powersync-attachments": "0.0.0-dev-20231031151134",
     "@journeyapps/powersync-sdk-react-native": "0.0.2",
     "@journeyapps/react-native-quick-sqlite": "0.0.2",
     "@react-native-community/masked-view": "^0.1.11",
