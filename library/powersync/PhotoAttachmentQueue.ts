@@ -12,7 +12,10 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
       this.trigger = () => {};
       return;
     }
-    return super.init();
+
+    // Ensure the directory where attachments are downloaded, exists
+    await this.storage.makeDir(this.storageDirectory);
+    await super.init();
   }
 
   async *attachmentIds(): AsyncIterable<string[]> {

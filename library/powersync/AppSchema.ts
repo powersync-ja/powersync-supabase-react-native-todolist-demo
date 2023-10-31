@@ -22,7 +22,7 @@ export interface TodoRecord {
   completed_by?: string;
   list_id: string;
 
-  photo_id?: string;
+  photo_id?: string; // This is the attachment id, 1:1 relationship
 }
 
 export enum AttachmentState {

@@ -32,19 +32,22 @@ export abstract class AbstractAttachmentQueue<T extends AttachmentQueueOptions =
     this.uploading = false;
     this.downloading = false;
     this.initialSync = true;
-
-    // Ensure the directory where attachments are downloaded, exists
-    this.storage.makeDir(this.storageDirectory);
   }
 
   /**
    * Returns an async iterator that yields attachment IDs that need to be synced.
-   * In most cases this will be a watch query, for example:
+   * In most cases this will be a watch query
    *
-   * for await (const result of powersync.watch('SELECT photo_id as id FROM todos WHERE photo_id IS NOT NULL', [])) {...}
+   * Example:
+   * for await (const result of powersync.watch('SELECT photo_id as id FROM todos WHERE photo_id IS NOT NULL', [])) {
+   *    yield result.rows?._array.map((r) => r.id) ?? [];
+   * }
    */
   abstract attachmentIds(): AsyncIterable<string[]>;
 
+  /**
+   * Create a new AttachmentRecord, this gets called when the attachment id is not found in the database.
+   */
   abstract newAttachmentRecord(record?: Partial<AttachmentRecord>): AttachmentRecord;
 
   protected get powersync() {
@@ -323,7 +326,7 @@ export abstract class AbstractAttachmentQueue<T extends AttachmentQueueOptions =
       while (record) {
         const uploaded = await this.uploadAttachment(record);
         if (!uploaded) {
-          // TODO: Retry
+          // Then attachment failed to upload. We try all uploads when the next trigger() is called
           break;
         }
         record = await this.getNextUploadRecord();
@@ -366,6 +369,7 @@ export abstract class AbstractAttachmentQueue<T extends AttachmentQueueOptions =
   async watchDownloads() {
     for await (const ids of this.idsToDownload()) {
       ids.map((id) => this.downloadQueue.add(id));
+      // No need to await this, the lock will ensure only loop is running at a time
       this.downloadRecords();
     }
   }
