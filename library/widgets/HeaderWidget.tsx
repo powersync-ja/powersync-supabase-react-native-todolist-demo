@@ -1,4 +1,3 @@
-import { AbstractPowerSyncDatabase, usePowerSync } from '@journeyapps/powersync-sdk-react-native';
 import React from 'react';
 import { Alert, Text } from 'react-native';
 import { Icon } from 'react-native-elements';

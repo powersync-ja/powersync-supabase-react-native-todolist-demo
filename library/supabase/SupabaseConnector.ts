@@ -82,20 +82,21 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
       for (let op of transaction.crud) {
         lastOp = op;
         const table = this.client.from(op.table);
+        let error: any;
         switch (op.op) {
           case UpdateType.PUT:
             const record = { ...op.opData, id: op.id };
-            const { error } = await table.upsert(record);
-            if (error) {
-              throw new Error(`Could not upsert data to Supabase ${JSON.stringify(error)}`);
-            }
+            error = (await table.upsert(record)).error;
             break;
           case UpdateType.PATCH:
-            await table.update(op.opData).eq('id', op.id);
+            error = (await table.update(op.opData).eq('id', op.id)).error;
             break;
           case UpdateType.DELETE:
-            await table.delete().eq('id', op.id);
+            error = (await table.delete().eq('id', op.id)).error;
             break;
+        }
+        if (error) {
+          throw new Error(`Could not ${op.op} data to Supabase ${JSON.stringify(error)}`);
         }
       }
 
