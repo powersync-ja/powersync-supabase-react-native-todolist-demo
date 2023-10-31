@@ -1,3 +1,4 @@
+import { ATTACHMENT_TABLE, AttachmentRecord } from '@journeyapps/powersync-attachments';
 import { usePowerSync, usePowerSyncWatchedQuery } from '@journeyapps/powersync-sdk-react-native';
 import { CameraCapturedPicture } from 'expo-camera';
 import _ from 'lodash';
@@ -7,13 +8,7 @@ import { ScrollView, View, Text } from 'react-native';
 import { FAB } from 'react-native-elements';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import prompt from 'react-native-prompt-android';
-import {
-  ATTACHMENT_TABLE,
-  AttachmentRecord,
-  TODO_TABLE,
-  TodoRecord,
-  LIST_TABLE
-} from '../../../../library/powersync/AppSchema';
+import { TODO_TABLE, TodoRecord, LIST_TABLE } from '../../../../library/powersync/AppSchema';
 import { useSystem } from '../../../../library/powersync/system';
 import { TodoItemWidget } from '../../../../library/widgets/TodoItemWidget';
 

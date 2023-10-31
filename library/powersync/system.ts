@@ -2,16 +2,16 @@ import '@azure/core-asynciterator-polyfill';
 import 'react-native-polyfill-globals/auto';
 import React from 'react';
 import { AbstractPowerSyncDatabase, RNQSPowerSyncDatabaseOpenFactory } from '@journeyapps/powersync-sdk-react-native';
+import { SupabaseStorageAdapter } from '../storage/SupabaseStorageAdapter';
 
 import { AppSchema } from './AppSchema';
-import { AbstractStorageAdapter } from '../storage/AbstractStorageAdapter';
 import { SupabaseConnector } from '../supabase/SupabaseConnector';
 import { KVStorage } from '../storage/KVStorage';
 import { PhotoAttachmentQueue } from './PhotoAttachmentQueue';
 
 export class System {
   kvStorage: KVStorage;
-  storage: AbstractStorageAdapter;
+  storage: SupabaseStorageAdapter;
   supabaseConnector: SupabaseConnector;
   powersync: AbstractPowerSyncDatabase;
 

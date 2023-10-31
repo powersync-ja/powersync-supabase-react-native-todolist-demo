@@ -7,7 +7,7 @@ import {
 
 import { SupabaseClient, createClient } from '@supabase/supabase-js';
 import { AppConfig } from './AppConfig';
-import { SupabaseStorageAdapter } from './SupabaseStorageAdapter';
+import { SupabaseStorageAdapter } from '../storage/SupabaseStorageAdapter';
 import { System } from '../powersync/system';
 
 /// Postgres Response codes that we cannot recover from by retrying.

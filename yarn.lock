@@ -1608,6 +1608,13 @@
     "@types/yargs" "^17.0.8"
     chalk "^4.0.0"
 
+"@journeyapps/powersync-attachments@0.0.0-dev-20231031141050":
+  version "0.0.0-dev-20231031141050"
+  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-attachments/-/powersync-attachments-0.0.0-dev-20231031141050.tgz#57a1b1e27c5bdc068759e00fa6eadcedae62e339"
+  integrity sha512-jPwVOheb0VlsYKqZISXT7x73DBqPiYuBi5tHml0NRN2t+tkQqRt/qzooBFXd/FjtR6ysLT2ScFHxLYapqPSCJQ==
+  dependencies:
+    "@journeyapps/powersync-sdk-common" "0.0.2"
+
 "@journeyapps/powersync-react@0.0.2":
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/@journeyapps/powersync-react/-/powersync-react-0.0.2.tgz#fbb7fd535d9ca14873ff9cd465983c04afbe835a"

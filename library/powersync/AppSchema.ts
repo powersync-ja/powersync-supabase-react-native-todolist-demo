@@ -2,7 +2,6 @@ import { Column, ColumnType, Index, IndexedColumn, Schema, Table } from '@journe
 
 export const TODO_TABLE = 'todos';
 export const LIST_TABLE = 'lists';
-export const ATTACHMENT_TABLE = 'attachments';
 
 export interface ListRecord {
   id: string;
@@ -23,24 +22,6 @@ export interface TodoRecord {
   list_id: string;
 
   photo_id?: string; // This is the attachment id, 1:1 relationship
-}
-
-export enum AttachmentState {
-  QUEUED_SYNC = 0, // Check if the attachment needs to be uploaded or downloaded
-  QUEUED_UPLOAD = 1, // Attachment to be uploaded
-  QUEUED_DOWNLOAD = 2, // Attachment to be downloaded
-  SYNCED = 3, // Attachment has been synced
-  ARCHIVED = 4 // Attachment has been orphaned, i.e. the associated record has been deleted
-}
-
-export interface AttachmentRecord {
-  id: string;
-  filename: string;
-  local_uri?: string;
-  size?: number;
-  media_type?: string;
-  timestamp?: number;
-  state: AttachmentState;
 }
 
 export const AppSchema = new Schema([
@@ -69,19 +50,6 @@ export const AppSchema = new Schema([
       new Column({ name: 'created_at', type: ColumnType.TEXT }),
       new Column({ name: 'name', type: ColumnType.TEXT }),
       new Column({ name: 'owner_id', type: ColumnType.TEXT })
-    ]
-  }),
-
-  // Attachment table
-  Table.createLocalOnly({
-    name: 'attachments',
-    columns: [
-      new Column({ name: 'filename', type: ColumnType.TEXT }),
-      new Column({ name: 'local_uri', type: ColumnType.TEXT }),
-      new Column({ name: 'timestamp', type: ColumnType.INTEGER }),
-      new Column({ name: 'size', type: ColumnType.INTEGER }),
-      new Column({ name: 'media_type', type: ColumnType.TEXT }),
-      new Column({ name: 'state', type: ColumnType.INTEGER }) // Corresponds to AttachmentState
     ]
   })
 ]);

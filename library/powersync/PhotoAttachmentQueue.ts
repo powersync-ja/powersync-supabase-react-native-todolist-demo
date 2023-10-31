@@ -1,20 +1,18 @@
 import * as FileSystem from 'expo-file-system';
 import { v4 as uuid } from 'uuid';
 import { AppConfig } from '../supabase/AppConfig';
-import { AbstractAttachmentQueue } from './AbstractAttachmentQueue';
-import { AttachmentRecord, AttachmentState, TODO_TABLE } from './AppSchema';
+import { AbstractAttachmentQueue, AttachmentRecord, AttachmentState } from '@journeyapps/powersync-attachments';
+import { TODO_TABLE } from './AppSchema';
 
 export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
   async init() {
     if (!AppConfig.supabaseBucket) {
       console.debug('No Supabase bucket configured, skipping setting up PhotoAttachmentQueue watches');
-      // No-op trigger sync
-      this.trigger = () => {};
+      // Disable sync interval
+      this.options.syncInterval = undefined;
       return;
     }
 
-    // Ensure the directory where attachments are downloaded, exists
-    await this.storage.makeDir(this.storageDirectory);
     await super.init();
   }
 

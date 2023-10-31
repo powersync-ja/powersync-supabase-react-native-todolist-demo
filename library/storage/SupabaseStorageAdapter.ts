@@ -1,18 +1,16 @@
 import { SupabaseClient } from '@supabase/supabase-js';
+import { decode as decodeBase64 } from 'base64-arraybuffer';
 import * as FileSystem from 'expo-file-system';
-import { AppConfig } from './AppConfig';
-import {
-  AbstractStorageAdapter,
-  base64ToArrayBuffer,
-  BaseStorageAdapterOptions,
-  stringToArrayBuffer
-} from '../storage/AbstractStorageAdapter';
+import { AppConfig } from '../supabase/AppConfig';
+import { StorageAdapter } from '@journeyapps/powersync-attachments';
 
-export interface SupabaseStorageAdapterOptions extends BaseStorageAdapterOptions {
+export interface SupabaseStorageAdapterOptions {
   client: SupabaseClient;
 }
 
-export class SupabaseStorageAdapter extends AbstractStorageAdapter<SupabaseStorageAdapterOptions> {
+export class SupabaseStorageAdapter implements StorageAdapter {
+  constructor(private options: SupabaseStorageAdapterOptions) {}
+
   async uploadFile(
     filename: string,
     data: ArrayBuffer,
@@ -68,9 +66,9 @@ export class SupabaseStorageAdapter extends AbstractStorageAdapter<SupabaseStora
     }
     const fileContent = await FileSystem.readAsStringAsync(fileURI, options);
     if (encoding === FileSystem.EncodingType.Base64) {
-      return base64ToArrayBuffer(fileContent);
+      return this.base64ToArrayBuffer(fileContent);
     }
-    return stringToArrayBuffer(fileContent);
+    return this.stringToArrayBuffer(fileContent);
   }
 
   async deleteFile(uri: string, options?: { filename?: string }): Promise<void> {
@@ -114,5 +112,17 @@ export class SupabaseStorageAdapter extends AbstractStorageAdapter<SupabaseStora
 
   getUserStorageDirectory(): string {
     return FileSystem.documentDirectory!;
+  }
+
+  async stringToArrayBuffer(str: string): Promise<ArrayBuffer> {
+    const encoder = new TextEncoder();
+    return encoder.encode(str).buffer;
+  }
+
+  /**
+   * Converts a base64 string to an ArrayBuffer
+   */
+  async base64ToArrayBuffer(base64: string): Promise<ArrayBuffer> {
+    return decodeBase64(base64);
   }
 }
