@@ -108,7 +108,7 @@ const TodoView: React.FC = () => {
       if (photoRecord != null) {
         await system.attachmentQueue.delete(photoRecord, tx);
       }
-      await tx.executeAsync(`DELETE FROM ${TODO_TABLE} WHERE id = ?`, [id]);
+      await tx.execute(`DELETE FROM ${TODO_TABLE} WHERE id = ?`, [id]);
     });
   };
 

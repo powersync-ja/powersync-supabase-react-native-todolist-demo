@@ -175,7 +175,7 @@ export abstract class AbstractAttachmentQueue<T extends AttachmentQueueOptions =
 
   async delete(record: AttachmentRecord, tx?: Transaction): Promise<void> {
     const deleteRecord = async (tx: Transaction) => {
-      await tx.executeAsync(
+      await tx.execute(
         `DELETE
              FROM ${this.table}
              WHERE id = ?`,
@@ -430,7 +430,7 @@ export abstract class AbstractAttachmentQueue<T extends AttachmentQueueOptions =
   async clearQueue(): Promise<void> {
     console.debug(`Clearing attachment queue...`);
     await this.powersync.writeTransaction(async (tx) => {
-      await tx.executeAsync(`DELETE FROM ${this.table}`);
+      await tx.execute(`DELETE FROM ${this.table}`);
     });
   }
 }

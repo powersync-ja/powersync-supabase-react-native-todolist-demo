@@ -45,9 +45,9 @@ const ListsViewWidget: React.FC = () => {
   const deleteList = async (id: string) => {
     await system.powersync.writeTransaction(async (tx) => {
       // Delete associated todos
-      await tx.executeAsync(`DELETE FROM ${TODO_TABLE} WHERE list_id = ?`, [id]);
+      await tx.execute(`DELETE FROM ${TODO_TABLE} WHERE list_id = ?`, [id]);
       // Delete list record
-      await tx.executeAsync(`DELETE FROM ${LIST_TABLE} WHERE id = ?`, [id]);
+      await tx.execute(`DELETE FROM ${LIST_TABLE} WHERE id = ?`, [id]);
     });
   };
 
