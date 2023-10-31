@@ -49,7 +49,7 @@ export class TodoModel extends AbstractModel<TodoRecord> {
   }
 
   async _delete(tx: Transaction): Promise<void> {
-    await tx.executeAsync(`DELETE FROM  ${this.table} WHERE id = ?`, [this.id]);
+    await tx.execute(`DELETE FROM  ${this.table} WHERE id = ?`, [this.id]);
     this.system.todoStore.removeModel(this);
   }
 }
