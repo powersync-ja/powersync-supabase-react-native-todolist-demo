@@ -1,8 +1,8 @@
 # PowerSync + Supabase React Native Demo: Todo List 
 
-## Note: Alpha Release
+## Note: Beta Release
 
-This package is currently in an alpha release. Functionality could change dramatically in future releases. Certain functions may be partially implemented or buggy.
+This package is currently in a beta release.
 
 ## Overview
 
