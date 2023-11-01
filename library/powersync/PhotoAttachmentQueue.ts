@@ -25,7 +25,7 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
     }
   }
 
-  newAttachmentRecord(record?: Partial<AttachmentRecord>): AttachmentRecord {
+  async newAttachmentRecord(record?: Partial<AttachmentRecord>): Promise<AttachmentRecord> {
     const photoId = record?.id ?? uuid();
     const filename = record?.filename ?? `${photoId}.jpg`;
     return {
@@ -38,7 +38,7 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
   }
 
   async savePhoto(base64Data: string): Promise<AttachmentRecord> {
-    const photoAttachment = this.newAttachmentRecord();
+    const photoAttachment = await this.newAttachmentRecord();
     photoAttachment.local_uri = this.getLocalUri(photoAttachment.filename);
     await this.storage.writeFile(photoAttachment.local_uri!, base64Data, { encoding: FileSystem.EncodingType.Base64 });
 
