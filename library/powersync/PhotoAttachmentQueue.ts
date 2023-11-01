@@ -7,9 +7,9 @@ import { TODO_TABLE } from './AppSchema';
 export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
   async init() {
     if (!AppConfig.supabaseBucket) {
-      console.debug('No Supabase bucket configured, skipping setting up PhotoAttachmentQueue watches');
-      // Disable sync interval
-      this.options.syncInterval = undefined;
+      console.debug('No Supabase bucket configured, skip setting up PhotoAttachmentQueue watches');
+      // Disable sync interval to prevent errors from trying to sync to a non-existent bucket
+      this.options.syncInterval = 0;
       return;
     }
 
