@@ -1,4 +1,4 @@
-package com.powersyncexample;
+package com.anonymous.powersyncexample;
 
 import android.os.Build;
 import android.os.Bundle;

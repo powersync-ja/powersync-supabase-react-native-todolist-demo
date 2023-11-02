@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { View, Text, ActivityIndicator, Button } from 'react-native';
 import { router } from 'expo-router';
 
-import { useSystem } from '../library/stores/system';
+import { useSystem } from '../library/powersync/system';
 import { TextInputWidget } from '../library/widgets/TextInputWidget';
 import { SignInStyles } from './signin';
 import { Icon } from 'react-native-elements';
@@ -40,7 +40,7 @@ export default function Register() {
                 setLoading(true);
                 setError('');
                 try {
-                  const { data, error } = await supabaseConnector.supabaseClient.auth.signUp({
+                  const { data, error } = await supabaseConnector.client.auth.signUp({
                     email: credentials.username,
                     password: credentials.password
                   });
@@ -48,7 +48,7 @@ export default function Register() {
                     throw error;
                   }
                   if (data.session) {
-                    supabaseConnector.supabaseClient.auth.setSession(data.session);
+                    supabaseConnector.client.auth.setSession(data.session);
                     router.replace('views/todos/lists');
                   } else {
                     router.replace('signin');

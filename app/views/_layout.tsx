@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSystem } from '../../library/stores/system';
+import { useSystem } from '../../library/powersync/system';
 import Drawer from '../../library/widgets/Drawer';
 
 /**

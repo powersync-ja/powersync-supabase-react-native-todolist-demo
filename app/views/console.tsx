@@ -1,13 +1,14 @@
 import _ from 'lodash';
 import React from 'react';
-import { Table, Row } from 'react-native-table-component';
+// @ts-ignore
+import { Table, Row } from 'react-native-reanimated-table';
 import { QueryResult } from '@journeyapps/powersync-sdk-react-native';
-import { useSystem } from '../../library/stores/system';
+import { useSystem } from '../../library/powersync/system';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
 
 const DEFAULT_QUERY = 'SELECT * from lists';
 
-const App = () => {
+const App: React.FC = () => {
   const { powersync } = useSystem();
   const [output, setOutput] = React.useState<QueryResult | null>(null);
 
@@ -29,11 +30,11 @@ const App = () => {
   const cellKeys = firstItem ? Object.keys(firstItem) : [];
 
   return (
-    <ScrollView style={{ flex: 1, flexGrow: 1 }}>
+    <ScrollView key={'console'} style={{ flex: 1, flexGrow: 1 }}>
       <TextInput defaultValue={DEFAULT_QUERY} onChangeText={executeQuery} />
       {output ? (
         <Table borderStyle={{ borderWidth: 2 }}>
-          {firstItem ? <Row style={{ backgroundColor: '#999' }} data={cellKeys} /> : null}
+          <Row style={{ backgroundColor: '#999' }} data={cellKeys} />
           {rows.map((row) => (
             <Row data={cellKeys.map((key) => row[key])} />
           ))}

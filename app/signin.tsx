@@ -2,7 +2,7 @@ import * as React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
-import { useSystem } from '../library/stores/system';
+import { useSystem } from '../library/powersync/system';
 import { Button } from 'react-native';
 import { TextInputWidget } from '../library/widgets/TextInputWidget';
 import { Icon } from 'react-native-elements';
@@ -23,7 +23,9 @@ export default function Signin() {
           <Icon name={'login'} size={100} type="material-community" style={{ padding: 5 }} />
           <TextInputWidget
             style={SignInStyles.input}
-            placeholder="Username"
+            inputMode={'email'}
+            placeholder={'Username'}
+            autoCapitalize={'none'}
             onChangeText={(value) => setCredentials({ ...credentials, username: value.toLowerCase().trim() })}
           />
           <TextInputWidget

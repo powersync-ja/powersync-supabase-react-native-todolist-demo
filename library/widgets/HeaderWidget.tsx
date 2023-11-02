@@ -2,17 +2,27 @@ import React from 'react';
 import { Alert, Text } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { useNavigation } from 'expo-router';
-import { useSystem } from '../stores/system';
 import { Header } from 'react-native-elements';
-import { observer } from 'mobx-react-lite';
 import { DrawerActions } from '@react-navigation/native';
+import { useSystem } from '../powersync/system';
 
 export const HeaderWidget: React.FC<{
   title?: string;
-}> = observer((props) => {
-  const { title } = props;
-  const { powersync } = useSystem();
+}> = (props) => {
+  const system = useSystem();
+  const { powersync } = system;
   const navigation = useNavigation();
+  const [connected, setConnected] = React.useState(powersync.connected);
+
+  React.useEffect(() => {
+    return powersync.registerListener({
+      statusChanged: (status) => {
+        setConnected(status.connected);
+      }
+    });
+  }, [powersync]);
+
+  const { title } = props;
   return (
     <Header
       leftComponent={
@@ -28,15 +38,16 @@ export const HeaderWidget: React.FC<{
       }
       rightComponent={
         <Icon
-          name={powersync.connected ? 'wifi' : 'wifi-off'}
+          name={connected ? 'wifi' : 'wifi-off'}
           type="material-community"
           color="black"
           size={20}
           style={{ padding: 5 }}
           onPress={() => {
+            system.attachmentQueue.trigger();
             Alert.alert(
               'Status',
-              `${powersync.connected ? 'Connected' : 'Disconnected'}. \nLast Synced at ${
+              `${connected ? 'Connected' : 'Disconnected'}. \nLast Synced at ${
                 powersync.currentStatus?.lastSyncedAt.toISOString() ?? '-'
               }\nVersion: ${powersync.sdkVersion}`
             );
@@ -46,4 +57,4 @@ export const HeaderWidget: React.FC<{
       centerComponent={<Text style={{ padding: 5, color: '#fff' }}>{title}</Text>}
     />
   );
-});
+};

@@ -19,6 +19,7 @@ create table
     created_by uuid null,
     completed_by uuid null,
     list_id uuid not null,
+    photo_id uuid null,
     constraint todos_pkey primary key (id),
     constraint todos_created_by_fkey foreign key (created_by) references auth.users (id) on delete set null,
     constraint todos_completed_by_fkey foreign key (completed_by) references auth.users (id) on delete set null,
@@ -68,3 +69,11 @@ end;
 $$ language plpgsql security definer;
 
 create trigger new_user_sample_data after insert on auth.users for each row execute procedure public.handle_new_user_sample_data();
+
+-- Attachments
+-- Ensure you have created a storage bucket named: 'media'
+-- Policies for storage allowing users to read and write their own files
+CREATE POLICY "Select media" ON storage.objects FOR SELECT TO public USING (bucket_id = 'media');
+CREATE POLICY "Insert media" ON storage.objects FOR INSERT TO public WITH CHECK (bucket_id = 'media');
+CREATE POLICY "Update media" ON storage.objects FOR UPDATE TO public USING (bucket_id = 'media');
+CREATE POLICY "Delete media" ON storage.objects FOR DELETE TO public USING (bucket_id = 'media');
