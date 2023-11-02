@@ -1608,17 +1608,24 @@
     "@types/yargs" "^17.0.8"
     chalk "^4.0.0"
 
-"@journeyapps/powersync-react@0.0.2":
+"@journeyapps/powersync-attachments@0.0.2":
   version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-react/-/powersync-react-0.0.2.tgz#fbb7fd535d9ca14873ff9cd465983c04afbe835a"
-  integrity sha512-g0kSSCTl2D8BH4kmRZLegP6YxO04i5tHyU9nfGMON5jOgG6Uq/SkZq7DWWVYFpmuRZ1fXOLTrKoCofSwK7hFpg==
+  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-attachments/-/powersync-attachments-0.0.2.tgz#5c5bf6746909dcb1665681c25841046fa5b8cd21"
+  integrity sha512-UmiKxbLqKpHPJEo5dLDAiI2k8Gcex1/2gj0Fd4pxrV4QKBFNON4o1IfyA5Z80gcUqRGDnOaBbiBMHgJdykRbkQ==
   dependencies:
-    "@journeyapps/powersync-sdk-common" "^0.0.2"
+    "@journeyapps/powersync-sdk-common" "0.1.1"
 
-"@journeyapps/powersync-sdk-common@0.0.2", "@journeyapps/powersync-sdk-common@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-sdk-common/-/powersync-sdk-common-0.0.2.tgz#2a7073f21491e85b4bb434c46b9833f5401579bd"
-  integrity sha512-J90yVpv1L+zmVy8PnMCo1KMur9Zq1IwNngyuhais2rmOIMzZzMzTE6sdcUlioq/cphI0wOagUEXcyE8+iLbptA==
+"@journeyapps/powersync-react@0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-react/-/powersync-react-0.1.0.tgz#32ff22a406efc74afa8553374ad3cbe9095af146"
+  integrity sha512-/AohvYYHd3AqX0OszY7feVc5DGlSkesYSR26yK78fXQLfeGLD62W2yg6iLEVbpcuComWhSLuXikvMQwx5VbSlw==
+  dependencies:
+    "@journeyapps/powersync-sdk-common" "^0.1.0"
+
+"@journeyapps/powersync-sdk-common@0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-sdk-common/-/powersync-sdk-common-0.1.1.tgz#880c1cfc79528f63370436df63ba38787b4b7369"
+  integrity sha512-hqblgRZ9EfGptASnEZ0EvN3l6HmniCNCHFfFebXJT7d7NZnZbiafBjVRJSlDJdFaFhF0ylpSuJHW23jkbpTg+A==
   dependencies:
     async-mutex "^0.4.0"
     can-ndjson-stream "^1.0.2"
@@ -1628,19 +1635,32 @@
     object-hash "^3.0.0"
     uuid "^3.0.0"
 
-"@journeyapps/powersync-sdk-react-native@0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-sdk-react-native/-/powersync-sdk-react-native-0.0.2.tgz#c9fc6388df0338efbcc977daa9571d41ad75a487"
-  integrity sha512-limSFo07tmg09jILxY8hI/DAkY/AbBfFrsbFOc6sqJmjYo6gM/TGGXkxpPru1UZlIZ2MboV+Y4ZCyDLDQuRspg==
+"@journeyapps/powersync-sdk-common@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-sdk-common/-/powersync-sdk-common-0.1.0.tgz#5221794a7a5871026e108a2e0c6bd0e49a379728"
+  integrity sha512-l8lUgWs5jtOW0klISxYbQLOP8L/8Uf5oeIGOF2db8D47FAOsiJnyooljXK4QW6qamagrfELGuUl4CEhhnXcZSg==
   dependencies:
-    "@journeyapps/powersync-react" "0.0.2"
-    "@journeyapps/powersync-sdk-common" "0.0.2"
+    async-mutex "^0.4.0"
+    can-ndjson-stream "^1.0.2"
+    event-iterator "^2.0.0"
+    js-logger "^1.6.1"
+    lodash "^4.17.21"
+    object-hash "^3.0.0"
+    uuid "^3.0.0"
+
+"@journeyapps/powersync-sdk-react-native@0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-sdk-react-native/-/powersync-sdk-react-native-0.1.1.tgz#cf72f3974f6208fd301b9ee4da7f07e482e5b8d3"
+  integrity sha512-hOngcqzG6bbQVQMB53TXMcFab/dMV9TQNFn2YiepC5vRHE+Y4AV/phbiUzfDtUcBh3rU6lqMtDIJYPcHHM70BQ==
+  dependencies:
+    "@journeyapps/powersync-react" "0.1.0"
+    "@journeyapps/powersync-sdk-common" "0.1.1"
     async-lock "^1.4.0"
 
-"@journeyapps/react-native-quick-sqlite@0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@journeyapps/react-native-quick-sqlite/-/react-native-quick-sqlite-0.0.2.tgz#a6bb13de4446a11163d4dca441928f187f7ef859"
-  integrity sha512-5kYfBCHKr8qNdgxTFces6huXeigeTpkfcVMSjuZgPW+4ljHsH7brdocvBKmx8iHz2Q7pZ7cIyV0RZ0oz/htnLA==
+"@journeyapps/react-native-quick-sqlite@0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@journeyapps/react-native-quick-sqlite/-/react-native-quick-sqlite-0.1.0.tgz#51f38f04c477cd8f457465aec48d097d7df85011"
+  integrity sha512-uF1R2RGFXhuY1vvjABAR47kuUSATJmf4RWLmTBHtBa8pLkPh/DKqbvCGhO9lsCC8JDzUfY0+xhsCmnQ4t5trow==
   dependencies:
     lodash "^4.17.21"
 

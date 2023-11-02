@@ -7,7 +7,7 @@ import {
 
 import { SupabaseClient, createClient } from '@supabase/supabase-js';
 import { AppConfig } from './AppConfig';
-import { SupabaseStorageAdapter } from './SupabaseStorageAdapter';
+import { SupabaseStorageAdapter } from '../storage/SupabaseStorageAdapter';
 import { System } from '../powersync/system';
 
 /// Postgres Response codes that we cannot recover from by retrying.
@@ -82,21 +82,22 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
       for (let op of transaction.crud) {
         lastOp = op;
         const table = this.client.from(op.table);
-        let error: any;
+        let result: any = null;
         switch (op.op) {
           case UpdateType.PUT:
             const record = { ...op.opData, id: op.id };
-            error = (await table.upsert(record)).error;
+            result = await table.upsert(record);
             break;
           case UpdateType.PATCH:
-            error = (await table.update(op.opData).eq('id', op.id)).error;
+            result = await table.update(op.opData).eq('id', op.id);
             break;
           case UpdateType.DELETE:
-            error = (await table.delete().eq('id', op.id)).error;
+            result = await table.delete().eq('id', op.id);
             break;
         }
-        if (error) {
-          throw new Error(`Could not ${op.op} data to Supabase ${JSON.stringify(error)}`);
+
+        if (result.error) {
+          throw new Error(`Could not ${op.op} data to Supabase error: ${JSON.stringify(result)}`);
         }
       }
 

@@ -1,8 +1,8 @@
 # PowerSync + Supabase React Native Demo: Todo List 
 
-## Note: Alpha Release
+## Note: Beta Release
 
-This package is currently in an alpha release. Functionality could change dramatically in future releases. Certain functions may be partially implemented or buggy.
+This package is currently in a beta release.
 
 ## Overview
 
@@ -45,7 +45,7 @@ It does the following:
 
 ## Set up PowerSync Instance
 
-Create a new PowerSync instance, connecting to the database of the Supabase project.
+Create a new PowerSync instance, connecting to the database of the Supabase project (find detailed instructions in the [Supabase<>PowerSync integration guide](https://docs.powersync.co/integration-guides/supabase)).
 
 Then deploy the following sync rules:
 

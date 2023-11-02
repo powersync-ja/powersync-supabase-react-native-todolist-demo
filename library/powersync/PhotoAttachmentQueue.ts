@@ -1,20 +1,18 @@
 import * as FileSystem from 'expo-file-system';
 import { v4 as uuid } from 'uuid';
 import { AppConfig } from '../supabase/AppConfig';
-import { AbstractAttachmentQueue } from './AbstractAttachmentQueue';
-import { AttachmentRecord, AttachmentState, TODO_TABLE } from './AppSchema';
+import { AbstractAttachmentQueue, AttachmentRecord, AttachmentState } from '@journeyapps/powersync-attachments';
+import { TODO_TABLE } from './AppSchema';
 
 export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
   async init() {
     if (!AppConfig.supabaseBucket) {
-      console.debug('No Supabase bucket configured, skipping setting up PhotoAttachmentQueue watches');
-      // No-op trigger sync
-      this.trigger = () => {};
+      console.debug('No Supabase bucket configured, skip setting up PhotoAttachmentQueue watches');
+      // Disable sync interval to prevent errors from trying to sync to a non-existent bucket
+      this.options.syncInterval = 0;
       return;
     }
 
-    // Ensure the directory where attachments are downloaded, exists
-    await this.storage.makeDir(this.storageDirectory);
     await super.init();
   }
 
@@ -27,7 +25,7 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
     }
   }
 
-  newAttachmentRecord(record?: Partial<AttachmentRecord>): AttachmentRecord {
+  async newAttachmentRecord(record?: Partial<AttachmentRecord>): Promise<AttachmentRecord> {
     const photoId = record?.id ?? uuid();
     const filename = record?.filename ?? `${photoId}.jpg`;
     return {
@@ -40,7 +38,7 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
   }
 
   async savePhoto(base64Data: string): Promise<AttachmentRecord> {
-    const photoAttachment = this.newAttachmentRecord();
+    const photoAttachment = await this.newAttachmentRecord();
     photoAttachment.local_uri = this.getLocalUri(photoAttachment.filename);
     await this.storage.writeFile(photoAttachment.local_uri!, base64Data, { encoding: FileSystem.EncodingType.Base64 });
 

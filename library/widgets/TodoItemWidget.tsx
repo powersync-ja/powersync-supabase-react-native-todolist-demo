@@ -3,7 +3,8 @@ import React from 'react';
 import { ActivityIndicator, Alert, View, Modal, StyleSheet } from 'react-native';
 import { ListItem, Button, Icon, Image } from 'react-native-elements';
 import { CameraWidget } from './CameraWidget';
-import { AttachmentRecord, TodoRecord } from '../powersync/AppSchema';
+import { TodoRecord } from '../powersync/AppSchema';
+import { AttachmentRecord } from '@journeyapps/powersync-attachments';
 
 export interface TodoItemWidgetProps {
   record: TodoRecord;
