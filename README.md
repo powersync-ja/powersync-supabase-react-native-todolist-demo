@@ -45,7 +45,7 @@ It does the following:
 
 ## Set up PowerSync Instance
 
-Create a new PowerSync instance, connecting to the database of the Supabase project.
+Create a new PowerSync instance, connecting to the database of the Supabase project (find detailed instructions in the [Supabase<>PowerSync integration guide](https://docs.powersync.co/integration-guides/supabase)).
 
 Then deploy the following sync rules:
 
