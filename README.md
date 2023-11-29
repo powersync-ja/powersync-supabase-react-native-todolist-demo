@@ -1,9 +1,5 @@
 # PowerSync + Supabase React Native Demo: Todo List 
 
-## Note: Beta Release
-
-This package is currently in a beta release.
-
 ## Overview
 
 Demo app demonstrating use of the [PowerSync SDK for React Native](https://www.npmjs.com/package/@journeyapps/powersync-sdk-react-native) together with Supabase.
