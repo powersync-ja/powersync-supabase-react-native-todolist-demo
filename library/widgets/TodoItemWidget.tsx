@@ -2,6 +2,7 @@ import { CameraCapturedPicture } from 'expo-camera';
 import React from 'react';
 import { ActivityIndicator, Alert, View, Modal, StyleSheet } from 'react-native';
 import { ListItem, Button, Icon, Image } from 'react-native-elements';
+import { useSystem } from '../powersync/system';
 import { CameraWidget } from './CameraWidget';
 import { TodoRecord } from '../powersync/AppSchema';
 import { AttachmentRecord } from '@journeyapps/powersync-attachments';
@@ -18,6 +19,7 @@ export const TodoItemWidget: React.FC<TodoItemWidgetProps> = (props) => {
   const { record, photoAttachment, onDelete, onToggleCompletion, onSavePhoto } = props;
   const [loading, setLoading] = React.useState(false);
   const [isCameraVisible, setCameraVisible] = React.useState(false);
+  const { attachmentQueue } = useSystem();
 
   const handleCancel = React.useCallback(() => {
     setCameraVisible(false);
@@ -71,7 +73,7 @@ export const TodoItemWidget: React.FC<TodoItemWidgetProps> = (props) => {
           <Icon name={'camera'} type="font-awesome" onPress={() => setCameraVisible(true)} />
         ) : photoAttachment?.local_uri != null ? (
           <Image
-            source={{ uri: photoAttachment.local_uri }}
+            source={{ uri: `${attachmentQueue.getLocalUri(photoAttachment.local_uri)}` }}
             containerStyle={styles.item}
             PlaceholderContent={<ActivityIndicator />}
           />

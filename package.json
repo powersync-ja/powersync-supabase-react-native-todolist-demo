@@ -1,6 +1,6 @@
 {
   "name": "powersync-example",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "expo-router/entry",
   "scripts": {
     "android": "expo run:android",
@@ -10,7 +10,7 @@
   "dependencies": {
     "@azure/core-asynciterator-polyfill": "^1.0.2",
     "@expo/vector-icons": "^13.0.0",
-    "@journeyapps/powersync-attachments": "0.0.5",
+    "@journeyapps/powersync-attachments": "^1.0.1",
     "@journeyapps/powersync-sdk-react-native": "^1.0.0",
     "@journeyapps/react-native-quick-sqlite": "^1.0.0",
     "@react-native-community/masked-view": "^0.1.11",

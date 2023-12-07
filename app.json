@@ -17,14 +17,14 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.powersync-example"
+      "bundleIdentifier": "co.powersync.example"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.powersyncexample"
+      "package": "co.powersync.example"
     },
     "web": {
       "favicon": "./assets/favicon.png"

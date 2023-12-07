@@ -1,7 +1,12 @@
 import * as FileSystem from 'expo-file-system';
 import { v4 as uuid } from 'uuid';
 import { AppConfig } from '../supabase/AppConfig';
-import { AbstractAttachmentQueue, AttachmentRecord, AttachmentState } from '@journeyapps/powersync-attachments';
+import {
+  AbstractAttachmentQueue,
+  AttachmentRecord,
+  AttachmentState,
+  EncodingType
+} from '@journeyapps/powersync-attachments';
 import { TODO_TABLE } from './AppSchema';
 
 export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
@@ -39,10 +44,11 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
 
   async savePhoto(base64Data: string): Promise<AttachmentRecord> {
     const photoAttachment = await this.newAttachmentRecord();
-    photoAttachment.local_uri = this.getLocalUri(photoAttachment.filename);
-    await this.storage.writeFile(photoAttachment.local_uri!, base64Data, { encoding: FileSystem.EncodingType.Base64 });
+    photoAttachment.local_uri = this.getLocalFilePathSuffix(photoAttachment.filename);
+    const localUri = this.getLocalUri(photoAttachment.local_uri);
+    await this.storage.writeFile(localUri, base64Data, { encoding: FileSystem.EncodingType.Base64 });
 
-    const fileInfo = await FileSystem.getInfoAsync(photoAttachment.local_uri!);
+    const fileInfo = await FileSystem.getInfoAsync(localUri);
     if (fileInfo.exists) {
       photoAttachment.size = fileInfo.size;
     }
