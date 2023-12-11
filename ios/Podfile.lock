@@ -11,13 +11,13 @@ PODS:
     - ExpoModulesCore
   - EXFont (11.4.0):
     - ExpoModulesCore
-  - Expo (49.0.11):
+  - Expo (49.0.21):
     - ExpoModulesCore
   - ExpoHead (0.0.11):
     - ExpoModulesCore
   - ExpoKeepAwake (12.3.0):
     - ExpoModulesCore
-  - ExpoModulesCore (1.5.11):
+  - ExpoModulesCore (1.5.12):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
     - React-NativeModulesApple
@@ -37,9 +37,9 @@ PODS:
     - ReactCommon/turbomodule/core (= 0.72.6)
   - fmt (6.2.1)
   - glog (0.3.5)
-  - hermes-engine (0.72.4):
-    - hermes-engine/Pre-built (= 0.72.4)
-  - hermes-engine/Pre-built (0.72.4)
+  - hermes-engine (0.72.6):
+    - hermes-engine/Pre-built (= 0.72.6)
+  - hermes-engine/Pre-built (0.72.6)
   - libevent (2.1.12)
   - powersync-sqlite-core (0.1.3)
   - RCT-Folly (2021.07.22.00):
@@ -704,16 +704,16 @@ SPEC CHECKSUMS:
   EXConstants: ce5bbea779da8031ac818c36bea41b10e14d04e1
   EXFileSystem: aec89226b638b82cdd6d6c15d75a8b7f0696226d
   EXFont: 738c44c390953ebcbab075a4848bfbef025fd9ee
-  Expo: 8a2d2c235bcbe4f41774562a0635bd74c174858c
+  Expo: 61a8e1aa94311557c137c0a4dfd4fe78281cfbb4
   ExpoHead: 8da645502363b53eeb99d99276a0adbe0ec8cff0
   ExpoKeepAwake: be4cbd52d9b177cde0fd66daa1913afa3161fc1d
-  ExpoModulesCore: 51cb2e7ab4c8da14be3f40b66d54c1781002e99d
+  ExpoModulesCore: c480fd4e3c7c8e81f0a6ba3a7c56869f25fe016d
   EXSplashScreen: c0e7f2d4a640f3b875808ed0b88575538daf6d82
   FBLazyVector: 748c0ef74f2bf4b36cfcccf37916806940a64c32
   FBReactNativeSpec: 966f29e4e697de53a3b366355e8f57375c856ad9
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
-  hermes-engine: 81191603c4eaa01f5e4ae5737a9efcf64756c7b2
+  hermes-engine: 8057e75cfc1437b178ac86c8654b24e7fead7f60
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   powersync-sqlite-core: a8c9c0f5ddb25099973bece98776080400346fe3
   RCT-Folly: 424b8c9a7a0b9ab2886ffe9c3b041ef628fd4fb1
@@ -762,4 +762,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: ca4ef80ab82da8e06ec05fbf74d658757c516b63
 
-COCOAPODS: 1.13.0
+COCOAPODS: 1.14.3

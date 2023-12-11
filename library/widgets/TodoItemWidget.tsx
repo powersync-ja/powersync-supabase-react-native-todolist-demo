@@ -6,6 +6,7 @@ import { useSystem } from '../powersync/system';
 import { CameraWidget } from './CameraWidget';
 import { TodoRecord } from '../powersync/AppSchema';
 import { AttachmentRecord } from '@journeyapps/powersync-attachments';
+import { AppConfig } from '../supabase/AppConfig';
 
 export interface TodoItemWidgetProps {
   record: TodoRecord;
@@ -69,16 +70,18 @@ export const TodoItemWidget: React.FC<TodoItemWidgetProps> = (props) => {
         <ListItem.Content style={{ minHeight: 80 }}>
           <ListItem.Title>{record.description}</ListItem.Title>
         </ListItem.Content>
-        {record.photo_id == null ? (
-          <Icon name={'camera'} type="font-awesome" onPress={() => setCameraVisible(true)} />
-        ) : photoAttachment?.local_uri != null ? (
-          <Image
-            source={{ uri: `${attachmentQueue.getLocalUri(photoAttachment.local_uri)}` }}
-            containerStyle={styles.item}
-            PlaceholderContent={<ActivityIndicator />}
-          />
-        ) : (
-          <ActivityIndicator />
+        {AppConfig.supabaseBucket && (
+          record.photo_id == null ? (
+            <Icon name={'camera'} type="font-awesome" onPress={() => setCameraVisible(true)} />
+          ) : photoAttachment?.local_uri != null ? (
+            <Image
+              source={{ uri: photoAttachment.local_uri }}
+              containerStyle={styles.item}
+              PlaceholderContent={<ActivityIndicator />}
+            />
+          ) : (
+            <ActivityIndicator />
+          )
         )}
       </ListItem.Swipeable>
     </View>
