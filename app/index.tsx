@@ -15,7 +15,8 @@ const App: React.FC = () => {
   const { supabaseConnector } = useSystem();
 
   React.useEffect(() => {
-    Logger.useDefaults();
+    // some linters incorrectly flag this as a hook, most likely due to its name
+    Logger.useDefaults(); // eslint-disable-line
     Logger.setLevel(Logger.DEBUG);
     supabaseConnector.client.auth
       .getSession()
