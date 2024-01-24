@@ -1615,12 +1615,12 @@
   dependencies:
     "@journeyapps/powersync-sdk-common" "1.0.0"
 
-"@journeyapps/powersync-react@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.npmjs.org/@journeyapps/powersync-react/-/powersync-react-1.0.0.tgz#01e6745d44d2285503f6343e03aa9814d23fd869"
-  integrity sha512-WMSIScA4cZbBBFAD9p/v6vn/0ixv0tLaVMcx84pIkUSy9FNn8gI0G9ciwUIcyGSNI1sMnCjyH76NwXo48WtY5w==
+"@journeyapps/powersync-react@1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-react/-/powersync-react-1.0.2.tgz#54751310cc1fe44828deffbfd21bead8e4af0f32"
+  integrity sha512-3B/HOlWmoVCgmV5WDy4WjPYFhjOiasb/OPA3cfMLX2a2vaN1emUw7GVoLBuzyhFnfwYAg75+BrBeL7kNq5tvGg==
   dependencies:
-    "@journeyapps/powersync-sdk-common" "1.0.0"
+    "@journeyapps/powersync-sdk-common" "1.1.0"
 
 "@journeyapps/powersync-sdk-common@1.0.0":
   version "1.0.0"
@@ -1635,19 +1635,32 @@
     object-hash "^3.0.0"
     uuid "^3.0.0"
 
-"@journeyapps/powersync-sdk-react-native@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.npmjs.org/@journeyapps/powersync-sdk-react-native/-/powersync-sdk-react-native-1.0.0.tgz#3045996fbe01bcdf5f9337b47b41fa936439469c"
-  integrity sha512-ptrJeyhfSHRDqtP8n+b3AHFhofHmnMr/LJimr6DowMVO1w6PWZI0XUA+VfA6RtzXMe6Ct5FARVqlLbQ/l1ZXpA==
+"@journeyapps/powersync-sdk-common@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-sdk-common/-/powersync-sdk-common-1.1.0.tgz#7a970064714977bd955c5d51acc36a1c90ad3cca"
+  integrity sha512-cG72V/t5vPke0BgExQYBxmMpcOSE8M8C1FR3pz4GJ5RnwDTgsq8rcsKECZTGp+QKIrRKtHQMPRkcCfLZriz+WA==
   dependencies:
-    "@journeyapps/powersync-react" "1.0.0"
-    "@journeyapps/powersync-sdk-common" "1.0.0"
+    async-mutex "^0.4.0"
+    can-ndjson-stream "^1.0.2"
+    event-iterator "^2.0.0"
+    js-logger "^1.6.1"
+    lodash "^4.17.21"
+    object-hash "^3.0.0"
+    uuid "^3.0.0"
+
+"@journeyapps/powersync-sdk-react-native@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-sdk-react-native/-/powersync-sdk-react-native-1.1.0.tgz#48461203a34bdf081f8a58e1620c74f2288db8fb"
+  integrity sha512-ZA078qoUm4kmcRbTPNWd60A9WRay6euhZx3krS5hPVyklXCXy9GBrxdpbx+8LrAziCEZc3idpN/l7TqN+waG/g==
+  dependencies:
+    "@journeyapps/powersync-react" "1.0.2"
+    "@journeyapps/powersync-sdk-common" "1.1.0"
     async-lock "^1.4.0"
 
-"@journeyapps/react-native-quick-sqlite@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.npmjs.org/@journeyapps/react-native-quick-sqlite/-/react-native-quick-sqlite-1.0.0.tgz#bb836a82a64705a2be6de27560b1e8816bba19d0"
-  integrity sha512-rQPE5OoMfXCyBBnCNMhkd4pES8zt0CbxiWb6GfZ04ik/cKji14GWBkvw9YZdyutc3zb3CNiexHYP1xZzlQYTQg==
+"@journeyapps/react-native-quick-sqlite@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@journeyapps/react-native-quick-sqlite/-/react-native-quick-sqlite-1.1.0.tgz#cf4aa6694b7232d0f86e565fdba4e41ef15d80cc"
+  integrity sha512-Pg6VA6ABC7N5FrNB5eqTgNsKdzzmDSp5aBtnQh1BlcZu7ISPZdCcKo+ZJtKyzTAWpc17LIttvJwxez6zBxUdOw==
   dependencies:
     lodash "^4.17.21"
     uuid "3.4.0"
