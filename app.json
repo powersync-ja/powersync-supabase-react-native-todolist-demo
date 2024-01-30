@@ -12,9 +12,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.powersync.example"
@@ -35,6 +33,19 @@
         "expo-camera",
         {
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera."
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "flipper": false,
+            "networkInspector": false,
+            "deploymentTarget": "13.0"
+          },
+          "android": {
+            "networkInspector": false
+          }
         }
       ]
     ]

@@ -41,12 +41,13 @@ export const AppSchema = new Schema([
     indexes: [
       new Index({
         name: 'list',
-        columns: [new IndexedColumn({ name: 'list_id' })]
+        columns: [new IndexedColumn({ name: 'list_idddd' })]
       })
     ]
   }),
   new Table({
     name: 'lists',
+    viewName: 'blabla',
     columns: [
       new Column({ name: 'created_at', type: ColumnType.TEXT }),
       new Column({ name: 'name', type: ColumnType.TEXT }),
