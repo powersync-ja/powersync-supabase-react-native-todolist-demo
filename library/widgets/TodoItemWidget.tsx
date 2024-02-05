@@ -70,8 +70,8 @@ export const TodoItemWidget: React.FC<TodoItemWidgetProps> = (props) => {
         <ListItem.Content style={{ minHeight: 80 }}>
           <ListItem.Title>{record.description}</ListItem.Title>
         </ListItem.Content>
-        {AppConfig.supabaseBucket && (
-          record.photo_id == null ? (
+        {AppConfig.supabaseBucket &&
+          (record.photo_id == null ? (
             <Icon name={'camera'} type="font-awesome" onPress={() => setCameraVisible(true)} />
           ) : photoAttachment?.local_uri != null ? (
             <Image
@@ -81,8 +81,7 @@ export const TodoItemWidget: React.FC<TodoItemWidgetProps> = (props) => {
             />
           ) : (
             <ActivityIndicator />
-          )
-        )}
+          ))}
       </ListItem.Swipeable>
     </View>
   );
