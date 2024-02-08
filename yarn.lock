@@ -1608,24 +1608,24 @@
     "@types/yargs" "^17.0.8"
     chalk "^4.0.0"
 
-"@journeyapps/powersync-attachments@^1.0.3":
+"@journeyapps/powersync-attachments@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-attachments/-/powersync-attachments-1.0.4.tgz#29c08cef358a326c88b9a8c28c97a8f5e05ff39d"
+  integrity sha512-4UhcAOiILuDTc2RHGb3k3WanN0j6oq7RO03KaglHVfdhIFkMTkA8URqGn1g3fShpuqFXSKp0uKZOcV+PrIecnQ==
+  dependencies:
+    "@journeyapps/powersync-sdk-common" "1.2.0"
+
+"@journeyapps/powersync-react@1.0.3":
   version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-attachments/-/powersync-attachments-1.0.3.tgz#b6052e9502dcc9c87f54a018eb306b1e320437c5"
-  integrity sha512-1pO1XwvXbagLohn/bnd9DD9eQZppIFl5Alf9TARXDQa2QbQ9bOY/vROfTOnUsOA3lPoG0hjkqw1X6E6oztKnTg==
+  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-react/-/powersync-react-1.0.3.tgz#8d87e6b99c38da5ff80887008b13c9016e1a2762"
+  integrity sha512-hTpeQ6TvqiqvC6RVqa7fwhhE1xtanxMu8InWPf0uL7nR7b5GNdvpIcs38V99j7k0oWEFP+mnc0i/OeMY2Lx3MQ==
   dependencies:
-    "@journeyapps/powersync-sdk-common" "1.1.0"
+    "@journeyapps/powersync-sdk-common" "1.2.0"
 
-"@journeyapps/powersync-react@1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-react/-/powersync-react-1.0.2.tgz#54751310cc1fe44828deffbfd21bead8e4af0f32"
-  integrity sha512-3B/HOlWmoVCgmV5WDy4WjPYFhjOiasb/OPA3cfMLX2a2vaN1emUw7GVoLBuzyhFnfwYAg75+BrBeL7kNq5tvGg==
-  dependencies:
-    "@journeyapps/powersync-sdk-common" "1.1.0"
-
-"@journeyapps/powersync-sdk-common@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-sdk-common/-/powersync-sdk-common-1.1.0.tgz#7a970064714977bd955c5d51acc36a1c90ad3cca"
-  integrity sha512-cG72V/t5vPke0BgExQYBxmMpcOSE8M8C1FR3pz4GJ5RnwDTgsq8rcsKECZTGp+QKIrRKtHQMPRkcCfLZriz+WA==
+"@journeyapps/powersync-sdk-common@1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-sdk-common/-/powersync-sdk-common-1.2.0.tgz#bfa63d17fce043c1e0a768019f0020d3785a4238"
+  integrity sha512-R6gkDXMCMLh8T8xvgcCxt4/djMYfjL4r1opmrUVFTxk/Kbs/P3nqinlcF6sE8ZEYtv+UZoc168hA6NDpJp47xA==
   dependencies:
     async-mutex "^0.4.0"
     can-ndjson-stream "^1.0.2"
@@ -1635,19 +1635,19 @@
     object-hash "^3.0.0"
     uuid "^3.0.0"
 
-"@journeyapps/powersync-sdk-react-native@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-sdk-react-native/-/powersync-sdk-react-native-1.1.0.tgz#48461203a34bdf081f8a58e1620c74f2288db8fb"
-  integrity sha512-ZA078qoUm4kmcRbTPNWd60A9WRay6euhZx3krS5hPVyklXCXy9GBrxdpbx+8LrAziCEZc3idpN/l7TqN+waG/g==
+"@journeyapps/powersync-sdk-react-native@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@journeyapps/powersync-sdk-react-native/-/powersync-sdk-react-native-1.2.0.tgz#ac3a18c86bd010b94d8575907f8263faad59d045"
+  integrity sha512-dVdSqc72WECIaqVlWDTIe0hUioL8YBUniWMFwLO+mtwXJjUGFKP8lFe1cuFVCdoYX73oqlhFZr8LLpE9LXaGsw==
   dependencies:
-    "@journeyapps/powersync-react" "1.0.2"
-    "@journeyapps/powersync-sdk-common" "1.1.0"
+    "@journeyapps/powersync-react" "1.0.3"
+    "@journeyapps/powersync-sdk-common" "1.2.0"
     async-lock "^1.4.0"
 
-"@journeyapps/react-native-quick-sqlite@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@journeyapps/react-native-quick-sqlite/-/react-native-quick-sqlite-1.1.0.tgz#cf4aa6694b7232d0f86e565fdba4e41ef15d80cc"
-  integrity sha512-Pg6VA6ABC7N5FrNB5eqTgNsKdzzmDSp5aBtnQh1BlcZu7ISPZdCcKo+ZJtKyzTAWpc17LIttvJwxez6zBxUdOw==
+"@journeyapps/react-native-quick-sqlite@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@journeyapps/react-native-quick-sqlite/-/react-native-quick-sqlite-1.1.1.tgz#2b13d739ca73026453717c887246f8e4a23f5f44"
+  integrity sha512-5I8zUZoFRgtnagjQygqnSyWG0L39ycFvum+ytsMmFW8LY1GpEZ+a3I6fWggwM82/Cc9YOheCVRIz47g0uBBZug==
   dependencies:
     lodash "^4.17.21"
     uuid "3.4.0"
